@@ -32,6 +32,7 @@ func ProbeFile(filepath string) (result *ProbeResult, err error) {
 
 	process := exec.Command("ffprobe", "-i", filepath, "-print_format", "json", "-show_format", "-show_streams")
 
+	process.Env = os.Environ()
 	process.Stderr = os.Stderr
 
 	var out strings.Builder
@@ -67,6 +68,7 @@ func FfmpegExtractStream(cwd string, filepath string, stream ProbeStream) (filen
 	process := exec.Command("ffmped", "-y", "-i", filepath, "-map", "0:"+strconv.Itoa(stream.Index), "-c", "copy", "-f", stream.CodecName, tmpFilename)
 	process.Dir = cwd
 
+	process.Env = os.Environ()
 	process.Stdin = os.Stdin
 	process.Stdout = os.Stdout
 	process.Stderr = os.Stderr
