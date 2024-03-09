@@ -52,9 +52,9 @@ var CODEC_TARGET_FORMAT = []TargetFormat{
 		codecParams: []string{"-bsf:v", "hevc_mp4toannexb"},
 		format:      "hls",
 		formatParams: []string{
-			"-hls_time", "30",
+			"-hls_time", "2",
 			"-hls_segment_filename", "sig.mp4",
-			"-hls_flags", "append_list+single_file",
+			"-hls_flags", "append_list+single_file+split_by_time",
 			"-hls_playlist_type", "event",
 			"-hls_segment_type", "fmp4",
 		},
