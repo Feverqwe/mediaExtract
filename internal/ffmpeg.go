@@ -21,7 +21,7 @@ type TargetFormat struct {
 
 func hlsConfigure(cwd string, format TargetFormat, stream *ProbeStream, ext string) TargetFormat {
 	idxStr := strconv.Itoa(stream.Index)
-	sigName := "sig-" + idxStr
+	sigName := idxStr + "-sig"
 	/* if err := os.MkdirAll(path.Join(cwd, dirname), DIR_PERM); err != nil {
 		panic(err)
 	} */
