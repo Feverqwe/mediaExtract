@@ -53,7 +53,7 @@ type ProbeResult struct {
 func ProbeFile(filepath string) (result *ProbeResult, err error) {
 	log.Printf("Probe file %s\n", filepath)
 
-	process := exec.Command("ffprobe", "-i", filepath, "-print_format", "json", "-show_format", "-show_streams")
+	process := exec.Command("ffprobe", "-hide_banner", "-i", filepath, "-print_format", "json", "-show_format", "-show_streams")
 
 	process.Env = os.Environ()
 	process.Stderr = os.Stderr
@@ -99,7 +99,7 @@ func FfmpegExtractStream(cwd string, filepath string, stream *ProbeStream) (file
 
 	tmpFilename := filename + ".tmp"
 
-	args := []string{"-y", "-i", filepath, "-map", "0:" + strconv.Itoa(stream.Index)}
+	args := []string{"-hide_banner", "-y", "-i", filepath, "-map", "0:" + strconv.Itoa(stream.Index)}
 
 	if len(format.codec) > 0 {
 		args = append(args, "-c", format.codec)
