@@ -42,7 +42,7 @@ func ExtractStream(cwd string, filepath string, stream ProbeStream) (err error) 
 		return
 	}
 
-	err = os.WriteFile(path.Join(cwd, metaFilename), data, FILE_PERM)
+	err = os.WriteFile(metaFilename, data, FILE_PERM)
 
 	return
 }
