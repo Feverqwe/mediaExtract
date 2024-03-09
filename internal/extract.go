@@ -82,11 +82,11 @@ func BuildMain(cwd string, files []ProcessedFile) (err error) {
 		case AUDIO_CODEC:
 			filename := path.Base(f.filename)
 			name := getStreamName(f.stream, filename)
-			lines = append(lines, "#EXT-X-MEDIA:TYPE=AUDIO,NAME=\""+url.QueryEscape(name)+"\",URI=\""+url.QueryEscape(filename)+"\"")
+			lines = append(lines, "#EXT-X-MEDIA:TYPE=AUDIO,NAME=\""+name+"\",URI=\""+url.QueryEscape(filename)+"\"")
 		case SUBTITLE_CODEC:
 			filename := path.Base(f.filename)
 			name := getStreamName(f.stream, filename)
-			lines = append(lines, "#EXT-X-MEDIA:TYPE=SUBTITLES,NAME=\""+url.QueryEscape(name)+"\",URI=\""+url.QueryEscape(filename)+"\"")
+			lines = append(lines, "#EXT-X-MEDIA:TYPE=SUBTITLES,NAME=\""+name+"\",URI=\""+url.QueryEscape(filename)+"\"")
 		}
 	}
 
