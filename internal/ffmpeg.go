@@ -10,11 +10,24 @@ import (
 	"strings"
 )
 
+type TargetFormat struct {
+	format string
+	ext    string
+}
+
+var CODEC_TARGET_FORMAT = map[string]TargetFormat{
+	"subrip": {
+		format: "srt",
+		ext:    "srt",
+	},
+}
+
 type ProbeStream struct {
-	Index     int               `json:"index"`
-	CodecName string            `json:"codec_name"`
-	CodecType string            `json:"codec_type"`
-	Tags      map[string]string `json:"tags"`
+	Index         int               `json:"index"`
+	OrigCodecName string            `json:"orig_codec_name"`
+	CodecName     string            `json:"codec_name"`
+	CodecType     string            `json:"codec_type"`
+	Tags          map[string]string `json:"tags"`
 }
 
 type ProbeFormat struct {
@@ -55,7 +68,17 @@ func ProbeFile(filepath string) (result *ProbeResult, err error) {
 func FfmpegExtractStream(cwd string, filepath string, stream ProbeStream) (filename string, err error) {
 	log.Printf("Extract stream %d %s\n", stream.Index, filepath)
 
-	name := strconv.Itoa(stream.Index) + "." + stream.CodecName
+	var format = TargetFormat{
+		ext:    stream.CodecName,
+		format: "data",
+	}
+	if val, ok := CODEC_TARGET_FORMAT[stream.CodecName]; ok {
+		format = val
+		stream.OrigCodecName = stream.CodecName
+		stream.CodecName = format.format
+	}
+
+	name := strconv.Itoa(stream.Index) + "." + format.ext
 	filename = path.Join(cwd, name)
 
 	if _, err = os.Stat(filename); err == nil {
@@ -65,7 +88,7 @@ func FfmpegExtractStream(cwd string, filepath string, stream ProbeStream) (filen
 
 	tmpFilename := filename + ".tmp"
 
-	process := exec.Command("ffmpeg", "-y", "-i", filepath, "-map", "0:"+strconv.Itoa(stream.Index), "-c", "copy", "-f", "data", tmpFilename)
+	process := exec.Command("ffmpeg", "-y", "-i", filepath, "-map", "0:"+strconv.Itoa(stream.Index), "-c", "copy", "-f", format.format, tmpFilename)
 	process.Dir = cwd
 
 	process.Env = os.Environ()
