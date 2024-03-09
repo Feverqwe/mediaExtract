@@ -120,6 +120,8 @@ func FfmpegExtractStream(cwd string, filepath string, stream *ProbeStream) (file
 
 	args = append(args, tmpFilename)
 
+	log.Printf("Run ffmpeg with args: %s\n", args)
+
 	process := exec.Command("ffmpeg", args...)
 	process.Dir = cwd
 
