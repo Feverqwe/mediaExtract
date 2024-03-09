@@ -43,18 +43,8 @@ var CODEC_TARGET_FORMAT = map[string]TargetFormat{
 		},
 	},
 	"subrip": {
-		codec:  "webvtt",
-		format: "hls",
-		formatParams: []string{
-			"-hls_time", "10",
-			"-hls_segment_filename", "sig.vtt",
-			"-hls_flags", "append_list+single_file",
-			"-hls_playlist_type", "event",
-		},
-		ext: "m3u8",
-		configurate: func(cwd string, format TargetFormat, stream *ProbeStream) TargetFormat {
-			return hlsConfigure(cwd, format, stream, ".vtt")
-		},
+		format: "webvtt",
+		ext:    "vtt",
 	},
 	"ac3": {
 		codec:       "libfdk_aac",
