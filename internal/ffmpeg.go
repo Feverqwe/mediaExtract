@@ -11,9 +11,10 @@ import (
 )
 
 type TargetFormat struct {
-	codec  string
-	format string
-	ext    string
+	codec       string
+	codecParams []string
+	format      string
+	ext         string
 }
 
 var CODEC_TARGET_FORMAT = map[string]TargetFormat{
@@ -21,6 +22,12 @@ var CODEC_TARGET_FORMAT = map[string]TargetFormat{
 		codec:  "",
 		format: "webvtt",
 		ext:    "vtt",
+	},
+	"ac3": {
+		codec:       "libfdk_aac",
+		codecParams: []string{"-vbr", "3"},
+		format:      "aac",
+		ext:         "aac",
 	},
 }
 
@@ -95,6 +102,10 @@ func FfmpegExtractStream(cwd string, filepath string, stream *ProbeStream) (file
 
 	if len(format.codec) > 0 {
 		args = append(args, "-c", format.codec)
+	}
+
+	if len(format.codecParams) > 0 {
+		args = append(args, format.codecParams...)
 	}
 
 	args = append(args, "-f", format.format, tmpFilename)
