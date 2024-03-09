@@ -25,10 +25,10 @@ var CODEC_TARGET_FORMAT = map[string]TargetFormat{
 		ext:    "vtt",
 	},
 	"ac3": {
-		codec:       "libfdk_aac",
-		codecParams: []string{"-vbr", "3"},
-		format:      "aac",
-		ext:         "aac",
+		codec:       "libopus",
+		codecParams: []string{"-vbr", "on", "-application", "audio", "-compression_level", "10"},
+		format:      "opus",
+		ext:         "opus",
 	},
 }
 
