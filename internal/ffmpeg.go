@@ -58,7 +58,7 @@ func FfmpegExtractStream(cwd string, filepath string, stream ProbeStream) (filen
 	name := strconv.Itoa(stream.Index) + "." + stream.CodecName
 	filename = path.Join(cwd, name)
 
-	if _, err = os.Stat(path.Join(cwd, filename)); err == nil {
+	if _, err = os.Stat(filename); err == nil {
 		log.Printf("File exists, skip extracting\n")
 		return
 	}
