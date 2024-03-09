@@ -16,6 +16,7 @@ type TargetFormat struct {
 	format       string
 	formatParams []string
 	ext          string
+	configurate  func(format TargetFormat, stream *ProbeStream) TargetFormat
 }
 
 var CODEC_TARGET_FORMAT = map[string]TargetFormat{
@@ -29,6 +30,17 @@ var CODEC_TARGET_FORMAT = map[string]TargetFormat{
 		codecParams: []string{"-vbr", "on", "-application", "audio", "-compression_level", "10"},
 		format:      "opus",
 		ext:         "opus",
+		configurate: func(format TargetFormat, stream *ProbeStream) TargetFormat {
+			if stream.CodecName == "ac3" {
+				if stream.ChannelLayout == "5.1(side)" {
+					format.codecParams = append(format.codecParams, "-af", "channelmap=channel_layout=5.1")
+				}
+				if stream.ChannelLayout == "5.0(side)" {
+					format.codecParams = append(format.codecParams, "-af", "channelmap=channel_layout=5.0")
+				}
+			}
+			return format
+		},
 	},
 }
 
@@ -85,18 +97,13 @@ func FfmpegExtractStream(cwd string, filepath string, stream *ProbeStream) (file
 		codec:  "copy",
 	}
 	if val, ok := CODEC_TARGET_FORMAT[stream.CodecName]; ok {
-		format = val
+		if val.configurate != nil {
+			format = val.configurate(val, stream)
+		} else {
+			format = val
+		}
 		stream.OrigCodecName = stream.CodecName
 		stream.CodecName = format.format
-
-		if stream.OrigCodecName == "ac3" {
-			if stream.ChannelLayout == "5.1(side)" {
-				format.codecParams = append(format.codecParams, "-af", "channelmap=channel_layout=5.1")
-			}
-			if stream.ChannelLayout == "5.0(side)" {
-				format.codecParams = append(format.codecParams, "-af", "channelmap=channel_layout=5.0")
-			}
-		}
 	}
 
 	name := strconv.Itoa(stream.Index) + "." + format.ext
