@@ -21,10 +21,15 @@ type TargetFormat struct {
 
 var CODEC_TARGET_FORMAT = map[string]TargetFormat{
 	"h264": {
-		codec:       "copy",
-		codecParams: []string{"-bsf:v", "h264_mp4toannexb"},
-		format:      "mp4",
-		ext:         "mp4",
+		codec:  "copy",
+		format: "hls",
+		formatParams: []string{
+			"-strftime_mkdir", "1",
+			"-hls_segment_filename", "data/%06d.ts",
+			"-hls_flags", "append_list",
+			"-hls_playlist_type", "event",
+		},
+		ext: "m3u8",
 	},
 	"subrip": {
 		codec:  "",
@@ -34,8 +39,14 @@ var CODEC_TARGET_FORMAT = map[string]TargetFormat{
 	"ac3": {
 		codec:       "libopus",
 		codecParams: []string{"-vbr", "on", "-application", "audio", "-compression_level", "10"},
-		format:      "opus",
-		ext:         "opus",
+		format:      "hls",
+		formatParams: []string{
+			"-strftime_mkdir", "1",
+			"-hls_segment_filename", "data/%06d.opus",
+			"-hls_flags", "append_list",
+			"-hls_playlist_type", "event",
+		},
+		ext: "m3u8",
 		configurate: func(format TargetFormat, stream *ProbeStream) TargetFormat {
 			if stream.CodecName == "ac3" {
 				if stream.ChannelLayout == "5.1(side)" {
@@ -117,6 +128,10 @@ func FfmpegExtractStream(cwd string, filepath string, stream *ProbeStream) (file
 
 	if _, err = os.Stat(filename); err == nil {
 		log.Printf("File exists, skip extracting\n")
+		return
+	}
+
+	if err = os.MkdirAll(path.Join(cwd, "data"), DIR_PERM); err != nil {
 		return
 	}
 
