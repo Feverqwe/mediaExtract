@@ -12,6 +12,7 @@ import (
 )
 
 type TargetFormat struct {
+	codecNames   []string
 	codec        string
 	codecParams  []string
 	format       string
@@ -29,10 +30,11 @@ func hlsConfigure(cwd string, format TargetFormat, stream *ProbeStream, ext stri
 	return format
 }
 
-var CODEC_TARGET_FORMAT = map[string]TargetFormat{
-	"h264": {
-		codec:  "copy",
-		format: "hls",
+var CODEC_TARGET_FORMAT = []TargetFormat{
+	{
+		codecNames: []string{"h264", "hevc"},
+		codec:      "copy",
+		format:     "hls",
 		formatParams: []string{
 			"-hls_time", "10",
 			"-hls_segment_filename", "sig.ts",
@@ -44,9 +46,10 @@ var CODEC_TARGET_FORMAT = map[string]TargetFormat{
 			return hlsConfigure(cwd, format, stream, ".m4v")
 		},
 	},
-	"subrip": {
-		format: "webvtt",
-		ext:    "vtt",
+	{
+		codecNames: []string{"subrip"},
+		format:     "webvtt",
+		ext:        "vtt",
 		postProcess: func(cwd, filepath string) (filename string, err error) {
 			filename = strings.TrimSuffix(filepath, path.Ext(filepath)) + ".m3u8"
 			if _, err = os.Stat(filename); err == nil {
@@ -63,8 +66,8 @@ var CODEC_TARGET_FORMAT = map[string]TargetFormat{
 			err = os.WriteFile(filename, []byte(data), FILE_PERM)
 			return
 		},
-	},
-	"ac3": {
+	}, {
+		codecNames:  []string{"ac3", "eac3"},
 		codec:       "libfdk_aac",
 		codecParams: []string{"-vbr", "5"},
 		format:      "hls",
@@ -133,7 +136,7 @@ func FfmpegExtractStream(cwd string, filepath string, stream *ProbeStream) (file
 		return
 	}
 
-	format, ok := CODEC_TARGET_FORMAT[stream.CodecName]
+	format, ok := getFormat(stream.CodecName)
 	if !ok {
 		panic(fmt.Errorf("unsupported codec: %s", stream.CodecName))
 	}
@@ -192,5 +195,18 @@ func FfmpegExtractStream(cwd string, filepath string, stream *ProbeStream) (file
 
 	err = os.Rename(tmpFilename, filename)
 
+	return
+}
+
+func getFormat(codecName string) (format TargetFormat, ok bool) {
+	for _, f := range CODEC_TARGET_FORMAT {
+		for _, c := range f.codecNames {
+			if c == codecName {
+				format = f
+				ok = true
+				return
+			}
+		}
+	}
 	return
 }
