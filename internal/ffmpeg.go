@@ -43,7 +43,8 @@ var CODEC_TARGET_FORMAT = map[string]TargetFormat{
 		},
 	},
 	"subrip": {
-		format: "webvtt",
+		codec:  "webvtt",
+		format: "hls",
 		formatParams: []string{
 			"-hls_time", "10",
 			"-hls_segment_filename", "sig.vtt",
