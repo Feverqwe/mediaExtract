@@ -22,9 +22,9 @@ type TargetFormat struct {
 func hlsConfigure(cwd string, format TargetFormat, stream *ProbeStream) TargetFormat {
 	idxStr := strconv.Itoa(stream.Index)
 	dirname := "data-" + idxStr
-	if err := os.MkdirAll(path.Join(cwd, dirname), DIR_PERM); err != nil {
+	/* if err := os.MkdirAll(path.Join(cwd, dirname), DIR_PERM); err != nil {
 		panic(err)
-	}
+	} */
 
 	format.formatParams = append(format.formatParams, "-hls_segment_filename", dirname+"/%06d.ts")
 	return format
@@ -35,16 +35,17 @@ var CODEC_TARGET_FORMAT = map[string]TargetFormat{
 		codec:  "copy",
 		format: "hls",
 		formatParams: []string{
+			"-strftime", "1",
 			"-strftime_mkdir", "1",
+			"-hls_time", "10",
 			"-hls_segment_filename", "data/%06d.ts",
-			"-hls_flags", "append_list",
+			"-hls_flags", "append_list,single_file",
 			"-hls_playlist_type", "event",
 		},
 		ext:         "m3u8",
 		configurate: hlsConfigure,
 	},
 	"subrip": {
-		codec:  "",
 		format: "webvtt",
 		ext:    "vtt",
 	},
@@ -53,9 +54,11 @@ var CODEC_TARGET_FORMAT = map[string]TargetFormat{
 		codecParams: []string{"-vbr", "on", "-application", "audio", "-compression_level", "10"},
 		format:      "hls",
 		formatParams: []string{
+			"-strftime", "1",
 			"-strftime_mkdir", "1",
+			"-hls_time", "10",
 			"-hls_segment_filename", "data/%06d.opus",
-			"-hls_flags", "append_list",
+			"-hls_flags", "append_list,single_file",
 			"-hls_playlist_type", "event",
 		},
 		ext: "m3u8",
