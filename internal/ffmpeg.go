@@ -65,7 +65,7 @@ func FfmpegExtractStream(cwd string, filepath string, stream ProbeStream) (filen
 
 	tmpFilename := filename + ".tmp"
 
-	process := exec.Command("ffmpeg", "-y", "-i", filepath, "-map", "0:"+strconv.Itoa(stream.Index), "-c", "copy", "-f", stream.CodecName, tmpFilename)
+	process := exec.Command("ffmpeg", "-y", "-i", filepath, "-map", "0:"+strconv.Itoa(stream.Index), "-c", "copy", "-f", "data", tmpFilename)
 	process.Dir = cwd
 
 	process.Env = os.Environ()
