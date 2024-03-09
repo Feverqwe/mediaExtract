@@ -45,13 +45,14 @@ func Extract(filepath string) (err error) {
 
 	for _, stream := range probe.Streams {
 		var filename string
-		filename, err = FfmpegExtractStream(cwd, filepath, &stream)
+		s := stream
+		filename, err = FfmpegExtractStream(cwd, filepath, &s)
 		if err != nil {
 			return
 		}
 		files = append(files, ProcessedFile{
 			filename: filename,
-			stream:   &stream,
+			stream:   &s,
 		})
 	}
 
