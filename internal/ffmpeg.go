@@ -2,6 +2,7 @@ package internal
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -132,20 +133,16 @@ func FfmpegExtractStream(cwd string, filepath string, stream *ProbeStream) (file
 		return
 	}
 
-	var format = TargetFormat{
-		ext:    stream.CodecName,
-		format: stream.CodecName,
-		codec:  "copy",
+	format, ok := CODEC_TARGET_FORMAT[stream.CodecName]
+	if !ok {
+		panic(fmt.Errorf("unsupported codec: %s", stream.CodecName))
 	}
-	if val, ok := CODEC_TARGET_FORMAT[stream.CodecName]; ok {
-		if val.configurate != nil {
-			format = val.configurate(cwd, val, stream)
-		} else {
-			format = val
-		}
-		stream.OrigCodecName = stream.CodecName
-		stream.CodecName = format.format
+
+	if format.configurate != nil {
+		format = format.configurate(cwd, format, stream)
 	}
+	stream.OrigCodecName = stream.CodecName
+	stream.CodecName = format.format
 
 	name := strconv.Itoa(stream.Index) + "." + format.ext
 	filename = path.Join(cwd, name)
