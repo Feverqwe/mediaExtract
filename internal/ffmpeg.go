@@ -188,9 +188,7 @@ func FfmpegExtractStream(cwd string, filepath string, stream *ProbeStream) (file
 		return
 	}
 
-	if err = os.Rename(tmpFilename, filename); err != nil {
-		return
-	}
+	err = os.Rename(tmpFilename, filename)
 
 	return
 }
