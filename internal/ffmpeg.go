@@ -67,16 +67,7 @@ var CODEC_TARGET_FORMAT = map[string]TargetFormat{
 		},
 		ext: "m3u8",
 		configurate: func(cwd string, format TargetFormat, stream *ProbeStream) TargetFormat {
-			format = hlsConfigure(cwd, format, stream, ".m4a")
-			if stream.CodecName == "ac3" {
-				if stream.ChannelLayout == "5.1(side)" {
-					format.codecParams = append(format.codecParams, "-af", "channelmap=channel_layout=5.1")
-				}
-				if stream.ChannelLayout == "5.0(side)" {
-					format.codecParams = append(format.codecParams, "-af", "channelmap=channel_layout=5.0")
-				}
-			}
-			return format
+			return hlsConfigure(cwd, format, stream, ".m4a")
 		},
 	},
 }
