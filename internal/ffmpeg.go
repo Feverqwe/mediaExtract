@@ -16,7 +16,18 @@ type TargetFormat struct {
 	format       string
 	formatParams []string
 	ext          string
-	configurate  func(format TargetFormat, stream *ProbeStream) TargetFormat
+	configurate  func(cwd string, format TargetFormat, stream *ProbeStream) TargetFormat
+}
+
+func hlsConfigure(cwd string, format TargetFormat, stream *ProbeStream) TargetFormat {
+	idxStr := strconv.Itoa(stream.Index)
+	dirname := "data-" + idxStr
+	if err := os.MkdirAll(path.Join(cwd, dirname), DIR_PERM); err != nil {
+		panic(err)
+	}
+
+	format.formatParams = append(format.formatParams, "-hls_segment_filename", dirname+"/%06d.opus")
+	return format
 }
 
 var CODEC_TARGET_FORMAT = map[string]TargetFormat{
@@ -29,7 +40,8 @@ var CODEC_TARGET_FORMAT = map[string]TargetFormat{
 			"-hls_flags", "append_list",
 			"-hls_playlist_type", "event",
 		},
-		ext: "m3u8",
+		ext:         "m3u8",
+		configurate: hlsConfigure,
 	},
 	"subrip": {
 		codec:  "",
@@ -47,7 +59,8 @@ var CODEC_TARGET_FORMAT = map[string]TargetFormat{
 			"-hls_playlist_type", "event",
 		},
 		ext: "m3u8",
-		configurate: func(format TargetFormat, stream *ProbeStream) TargetFormat {
+		configurate: func(cwd string, format TargetFormat, stream *ProbeStream) TargetFormat {
+			format = hlsConfigure(cwd, format, stream)
 			if stream.CodecName == "ac3" {
 				if stream.ChannelLayout == "5.1(side)" {
 					format.codecParams = append(format.codecParams, "-af", "channelmap=channel_layout=5.1")
@@ -115,7 +128,7 @@ func FfmpegExtractStream(cwd string, filepath string, stream *ProbeStream) (file
 	}
 	if val, ok := CODEC_TARGET_FORMAT[stream.CodecName]; ok {
 		if val.configurate != nil {
-			format = val.configurate(val, stream)
+			format = val.configurate(cwd, val, stream)
 		} else {
 			format = val
 		}
@@ -128,10 +141,6 @@ func FfmpegExtractStream(cwd string, filepath string, stream *ProbeStream) (file
 
 	if _, err = os.Stat(filename); err == nil {
 		log.Printf("File exists, skip extracting\n")
-		return
-	}
-
-	if err = os.MkdirAll(path.Join(cwd, "data"), DIR_PERM); err != nil {
 		return
 	}
 
