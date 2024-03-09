@@ -17,6 +17,7 @@ type TargetFormat struct {
 	formatParams []string
 	ext          string
 	configurate  func(cwd string, format TargetFormat, stream *ProbeStream) TargetFormat
+	postProcess  func(cwd string, filename string) (string, error)
 }
 
 func hlsConfigure(cwd string, format TargetFormat, stream *ProbeStream, ext string) TargetFormat {
@@ -45,6 +46,18 @@ var CODEC_TARGET_FORMAT = map[string]TargetFormat{
 	"subrip": {
 		format: "webvtt",
 		ext:    "vtt",
+		postProcess: func(cwd, filepath string) (filename string, err error) {
+			filename = strings.TrimSuffix(filepath, path.Ext(filepath)) + ".m3u8"
+			data := strings.Join([]string{
+				"#EXTM3U",
+				"#EXT-X-TARGETDURATION:0",
+				"#EXT-X-PLAYLIST-TYPE:VOD",
+				path.Base(filepath),
+				"#EXT-X-ENDLIST",
+			}, "\n")
+			err = os.WriteFile(filename, []byte(data), FILE_PERM)
+			return
+		},
 	},
 	"ac3": {
 		codec:       "libfdk_aac",
@@ -167,6 +180,10 @@ func FfmpegExtractStream(cwd string, filepath string, stream *ProbeStream) (file
 
 	if err = os.Rename(tmpFilename, filename); err != nil {
 		return
+	}
+
+	if format.postProcess != nil {
+		filename, err = format.postProcess(cwd, filename)
 	}
 
 	return
