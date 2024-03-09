@@ -22,7 +22,7 @@ type TargetFormat struct {
 var CODEC_TARGET_FORMAT = map[string]TargetFormat{
 	"h264": {
 		codec:  "copy",
-		format: "m4v",
+		format: "h264",
 		ext:    "m4v",
 	},
 	"subrip": {
@@ -98,7 +98,7 @@ func FfmpegExtractStream(cwd string, filepath string, stream *ProbeStream) (file
 
 	var format = TargetFormat{
 		ext:    stream.CodecName,
-		format: "data",
+		format: stream.CodecName,
 		codec:  "copy",
 	}
 	if val, ok := CODEC_TARGET_FORMAT[stream.CodecName]; ok {
