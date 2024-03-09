@@ -127,6 +127,11 @@ func ProbeFile(filepath string) (result *ProbeResult, err error) {
 func FfmpegExtractStream(cwd string, filepath string, stream *ProbeStream) (filename string, err error) {
 	log.Printf("Extract stream %d %s\n", stream.Index, filepath)
 
+	if stream.CodecType != VIDEO_CODEC && stream.CodecType != AUDIO_CODEC && stream.CodecType != SUBTITLE_CODEC {
+		log.Printf("Codec type is not supported: %s, skip\n", stream.CodecType)
+		return
+	}
+
 	var format = TargetFormat{
 		ext:    stream.CodecName,
 		format: stream.CodecName,
