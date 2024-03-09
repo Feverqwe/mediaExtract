@@ -48,6 +48,10 @@ var CODEC_TARGET_FORMAT = map[string]TargetFormat{
 		ext:    "vtt",
 		postProcess: func(cwd, filepath string) (filename string, err error) {
 			filename = strings.TrimSuffix(filepath, path.Ext(filepath)) + ".m3u8"
+			if _, err = os.Stat(filename); err == nil {
+				return
+			}
+
 			data := strings.Join([]string{
 				"#EXTM3U",
 				"#EXT-X-TARGETDURATION:0",
@@ -141,6 +145,12 @@ func FfmpegExtractStream(cwd string, filepath string, stream *ProbeStream) (file
 	name := strconv.Itoa(stream.Index) + "." + format.ext
 	filename = path.Join(cwd, name)
 
+	defer (func() {
+		if err == nil && format.postProcess != nil {
+			filename, err = format.postProcess(cwd, filename)
+		}
+	})()
+
 	if _, err = os.Stat(filename); err == nil {
 		log.Printf("File exists, skip extracting\n")
 		return
@@ -180,10 +190,6 @@ func FfmpegExtractStream(cwd string, filepath string, stream *ProbeStream) (file
 
 	if err = os.Rename(tmpFilename, filename); err != nil {
 		return
-	}
-
-	if format.postProcess != nil {
-		filename, err = format.postProcess(cwd, filename)
 	}
 
 	return
