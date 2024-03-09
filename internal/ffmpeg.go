@@ -32,7 +32,7 @@ func hlsConfigure(format TargetFormat, stream *ProbeStream, ext string) TargetFo
 
 var CODEC_TARGET_FORMAT = []TargetFormat{
 	{
-		codecNames: []string{"h264", "hevc"},
+		codecNames: []string{"h264"},
 		codec:      "copy",
 		format:     "hls",
 		formatParams: []string{
@@ -44,6 +44,22 @@ var CODEC_TARGET_FORMAT = []TargetFormat{
 		ext: "m3u8",
 		configurate: func(cwd string, format TargetFormat, stream *ProbeStream) TargetFormat {
 			return hlsConfigure(format, stream, ".m4v")
+		},
+	},
+	{
+		codecNames:  []string{"hevc"},
+		codec:       "copy",
+		codecParams: []string{"-bsf:v", "hevc_mp4toannexb"},
+		format:      "hls",
+		formatParams: []string{
+			"-hls_time", "10",
+			"-hls_segment_filename", "sig.ts",
+			"-hls_flags", "append_list+single_file",
+			"-hls_playlist_type", "event",
+		},
+		ext: "m3u8",
+		configurate: func(cwd string, format TargetFormat, stream *ProbeStream) TargetFormat {
+			return hlsConfigure(format, stream, ".ts")
 		},
 	},
 	{
