@@ -51,10 +51,11 @@ var CODEC_TARGET_FORMAT = []TargetFormat{
 		codec:      "copy",
 		format:     "hls",
 		formatParams: []string{
+			"-hls_time", "10",
 			"-hls_segment_filename", "sig.ts",
 			"-hls_flags", "append_list+single_file+split_by_time",
 			"-hls_playlist_type", "event",
-			"-hls_segment_type", "fmp4",
+			"-hls_segment_type", "mpegts",
 		},
 		ext: "m3u8",
 		configurate: func(cwd string, format TargetFormat, stream *ProbeStream) TargetFormat {
@@ -200,7 +201,6 @@ func FfmpegExtractStream(cwd string, filepath string, stream *ProbeStream) (file
 	process.Dir = cwd
 
 	process.Env = os.Environ()
-	process.Stdin = os.Stdin
 	process.Stdout = os.Stdout
 	process.Stderr = os.Stderr
 
