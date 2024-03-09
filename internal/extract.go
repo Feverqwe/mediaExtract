@@ -28,7 +28,7 @@ func Extract(filepath string) (err error) {
 	metaFilename := path.Join(cwd, "meta.json")
 	if _, err = os.Stat(metaFilename); err != nil {
 		var data []byte
-		data, err = json.Marshal(probe)
+		data, err = json.MarshalIndent(probe, "", " ")
 		if err != nil {
 			return
 		}
