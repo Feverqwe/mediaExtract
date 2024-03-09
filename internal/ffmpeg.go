@@ -11,10 +11,11 @@ import (
 )
 
 type TargetFormat struct {
-	codec       string
-	codecParams []string
-	format      string
-	ext         string
+	codec        string
+	codecParams  []string
+	format       string
+	formatParams []string
+	ext          string
 }
 
 var CODEC_TARGET_FORMAT = map[string]TargetFormat{
@@ -103,12 +104,16 @@ func FfmpegExtractStream(cwd string, filepath string, stream *ProbeStream) (file
 	if len(format.codec) > 0 {
 		args = append(args, "-c", format.codec)
 	}
-
 	if len(format.codecParams) > 0 {
 		args = append(args, format.codecParams...)
 	}
 
-	args = append(args, "-f", format.format, tmpFilename)
+	args = append(args, "-f", format.format)
+	if len(format.formatParams) > 0 {
+		args = append(args, format.formatParams...)
+	}
+
+	args = append(args, tmpFilename)
 
 	process := exec.Command("ffmpeg", args...)
 	process.Dir = cwd
