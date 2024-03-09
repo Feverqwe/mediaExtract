@@ -47,19 +47,20 @@ var CODEC_TARGET_FORMAT = []TargetFormat{
 		},
 	},
 	{
-		codecNames: []string{"hevc"},
-		codec:      "copy",
-		format:     "hls",
+		codecNames:  []string{"hevc"},
+		codec:       "copy",
+		codecParams: []string{"-bsf:v", "hevc_mp4toannexb"},
+		format:      "hls",
 		formatParams: []string{
 			"-hls_time", "10",
-			"-hls_segment_filename", "sig.ts",
+			"-hls_segment_filename", "sig.mp4",
 			"-hls_flags", "append_list+single_file+split_by_time",
 			"-hls_playlist_type", "event",
-			"-hls_segment_type", "mpegts",
+			"-hls_segment_type", "fmp4",
 		},
 		ext: "m3u8",
 		configurate: func(cwd string, format TargetFormat, stream *ProbeStream) TargetFormat {
-			return hlsConfigure(format, stream, ".ts")
+			return hlsConfigure(format, stream, ".mp4")
 		},
 	},
 	{
