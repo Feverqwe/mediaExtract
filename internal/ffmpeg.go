@@ -22,11 +22,8 @@ type TargetFormat struct {
 func hlsConfigure(cwd string, format TargetFormat, stream *ProbeStream, ext string) TargetFormat {
 	idxStr := strconv.Itoa(stream.Index)
 	sigName := idxStr + "-sig"
-	/* if err := os.MkdirAll(path.Join(cwd, dirname), DIR_PERM); err != nil {
-		panic(err)
-	} */
 
-	format.formatParams = append(format.formatParams, "-hls_segment_filename", sigName+"."+ext)
+	format.formatParams = append(format.formatParams, "-hls_segment_filename", sigName+ext)
 	return format
 }
 
@@ -50,8 +47,8 @@ var CODEC_TARGET_FORMAT = map[string]TargetFormat{
 		ext:    "vtt",
 	},
 	"ac3": {
-		codec:       "libopus",
-		codecParams: []string{"-vbr", "on", "-application", "audio", "-compression_level", "10"},
+		codec:       "libfdk_aac",
+		codecParams: []string{"-vbr", "3"},
 		format:      "hls",
 		formatParams: []string{
 			"-hls_time", "10",
@@ -61,7 +58,7 @@ var CODEC_TARGET_FORMAT = map[string]TargetFormat{
 		},
 		ext: "m3u8",
 		configurate: func(cwd string, format TargetFormat, stream *ProbeStream) TargetFormat {
-			format = hlsConfigure(cwd, format, stream, "opus")
+			format = hlsConfigure(cwd, format, stream, ".m4a")
 			if stream.CodecName == "ac3" {
 				if stream.ChannelLayout == "5.1(side)" {
 					format.codecParams = append(format.codecParams, "-af", "channelmap=channel_layout=5.1")
