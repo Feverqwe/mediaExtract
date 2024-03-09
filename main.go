@@ -11,6 +11,7 @@ func main() {
 
 	var filenameRel string
 	flag.StringVar(&filenameRel, "f", "", "Media file")
+	flag.Parse()
 
 	filename, err := filepath.Abs(filenameRel)
 	if err != nil {
