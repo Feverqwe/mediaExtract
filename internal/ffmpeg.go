@@ -22,7 +22,7 @@ type TargetFormat struct {
 	postProcess  func(cwd string, filename string) (string, error)
 }
 
-func hlsConfigure(cwd string, format TargetFormat, stream *ProbeStream, ext string) TargetFormat {
+func hlsConfigure(format TargetFormat, stream *ProbeStream, ext string) TargetFormat {
 	idxStr := strconv.Itoa(stream.Index)
 	sigName := idxStr + "-sig"
 
@@ -43,7 +43,7 @@ var CODEC_TARGET_FORMAT = []TargetFormat{
 		},
 		ext: "m3u8",
 		configurate: func(cwd string, format TargetFormat, stream *ProbeStream) TargetFormat {
-			return hlsConfigure(cwd, format, stream, ".m4v")
+			return hlsConfigure(format, stream, ".m4v")
 		},
 	},
 	{
@@ -79,7 +79,7 @@ var CODEC_TARGET_FORMAT = []TargetFormat{
 		},
 		ext: "m3u8",
 		configurate: func(cwd string, format TargetFormat, stream *ProbeStream) TargetFormat {
-			return hlsConfigure(cwd, format, stream, ".m4a")
+			return hlsConfigure(format, stream, ".m4a")
 		},
 	},
 }
