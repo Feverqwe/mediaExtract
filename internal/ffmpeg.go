@@ -35,10 +35,8 @@ var CODEC_TARGET_FORMAT = map[string]TargetFormat{
 		codec:  "copy",
 		format: "hls",
 		formatParams: []string{
-			"-strftime", "1",
-			"-strftime_mkdir", "1",
 			"-hls_time", "10",
-			"-hls_segment_filename", "data/%06d.ts",
+			"-hls_segment_filename", "sig.ts",
 			"-hls_flags", "append_list+single_file",
 			"-hls_playlist_type", "event",
 		},
@@ -54,10 +52,8 @@ var CODEC_TARGET_FORMAT = map[string]TargetFormat{
 		codecParams: []string{"-vbr", "on", "-application", "audio", "-compression_level", "10"},
 		format:      "hls",
 		formatParams: []string{
-			"-strftime", "1",
-			"-strftime_mkdir", "1",
 			"-hls_time", "10",
-			"-hls_segment_filename", "data/%06d.opus",
+			"-hls_segment_filename", "sig.opus",
 			"-hls_flags", "append_list+single_file",
 			"-hls_playlist_type", "event",
 		},
