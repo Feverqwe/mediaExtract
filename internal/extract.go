@@ -21,7 +21,7 @@ func Extract(filepath string) (err error) {
 	os.MkdirAll(cwd, DIR_PERM)
 
 	for _, stream := range probe.Streams {
-		if err = ExtractStream(cwd, filepath, stream); err != nil {
+		if err = ExtractStream(cwd, filepath, &stream); err != nil {
 			return
 		}
 
@@ -30,7 +30,7 @@ func Extract(filepath string) (err error) {
 	return
 }
 
-func ExtractStream(cwd string, filepath string, stream ProbeStream) (err error) {
+func ExtractStream(cwd string, filepath string, stream *ProbeStream) (err error) {
 	var filename string
 	if filename, err = FfmpegExtractStream(cwd, filepath, stream); err != nil {
 		return

@@ -67,7 +67,7 @@ func ProbeFile(filepath string) (result *ProbeResult, err error) {
 	return
 }
 
-func FfmpegExtractStream(cwd string, filepath string, stream ProbeStream) (filename string, err error) {
+func FfmpegExtractStream(cwd string, filepath string, stream *ProbeStream) (filename string, err error) {
 	log.Printf("Extract stream %d %s\n", stream.Index, filepath)
 
 	var format = TargetFormat{
