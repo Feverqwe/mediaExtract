@@ -20,6 +20,11 @@ type TargetFormat struct {
 }
 
 var CODEC_TARGET_FORMAT = map[string]TargetFormat{
+	"h264": {
+		codec:  "copy",
+		format: "data",
+		ext:    "m4v",
+	},
 	"subrip": {
 		codec:  "",
 		format: "webvtt",
