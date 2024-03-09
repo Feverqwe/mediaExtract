@@ -46,7 +46,7 @@ var CODEC_TARGET_FORMAT = map[string]TargetFormat{
 		format: "webvtt",
 		formatParams: []string{
 			"-hls_time", "10",
-			"-hls_segment_filename", "sig.ts",
+			"-hls_segment_filename", "sig.vtt",
 			"-hls_flags", "append_list+single_file",
 			"-hls_playlist_type", "event",
 		},
