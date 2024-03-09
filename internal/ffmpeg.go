@@ -48,7 +48,7 @@ var CODEC_TARGET_FORMAT = map[string]TargetFormat{
 	},
 	"ac3": {
 		codec:       "libfdk_aac",
-		codecParams: []string{"-vbr", "3"},
+		codecParams: []string{"-vbr", "5"},
 		format:      "hls",
 		formatParams: []string{
 			"-hls_time", "10",
