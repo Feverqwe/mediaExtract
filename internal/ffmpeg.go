@@ -26,7 +26,7 @@ func hlsConfigure(cwd string, format TargetFormat, stream *ProbeStream) TargetFo
 		panic(err)
 	}
 
-	format.formatParams = append(format.formatParams, "-hls_segment_filename", dirname+"/%06d.opus")
+	format.formatParams = append(format.formatParams, "-hls_segment_filename", dirname+"/%06d.ts")
 	return format
 }
 
