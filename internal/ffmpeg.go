@@ -19,14 +19,14 @@ type TargetFormat struct {
 	configurate  func(cwd string, format TargetFormat, stream *ProbeStream) TargetFormat
 }
 
-func hlsConfigure(cwd string, format TargetFormat, stream *ProbeStream) TargetFormat {
+func hlsConfigure(cwd string, format TargetFormat, stream *ProbeStream, ext string) TargetFormat {
 	idxStr := strconv.Itoa(stream.Index)
 	sigName := "sig-" + idxStr
 	/* if err := os.MkdirAll(path.Join(cwd, dirname), DIR_PERM); err != nil {
 		panic(err)
 	} */
 
-	format.formatParams = append(format.formatParams, "-hls_segment_filename", sigName+".ts")
+	format.formatParams = append(format.formatParams, "-hls_segment_filename", sigName+ext)
 	return format
 }
 
@@ -40,8 +40,10 @@ var CODEC_TARGET_FORMAT = map[string]TargetFormat{
 			"-hls_flags", "append_list+single_file",
 			"-hls_playlist_type", "event",
 		},
-		ext:         "m3u8",
-		configurate: hlsConfigure,
+		ext: "m3u8",
+		configurate: func(cwd string, format TargetFormat, stream *ProbeStream) TargetFormat {
+			return hlsConfigure(cwd, format, stream, "ts")
+		},
 	},
 	"subrip": {
 		format: "webvtt",
@@ -59,7 +61,7 @@ var CODEC_TARGET_FORMAT = map[string]TargetFormat{
 		},
 		ext: "m3u8",
 		configurate: func(cwd string, format TargetFormat, stream *ProbeStream) TargetFormat {
-			format = hlsConfigure(cwd, format, stream)
+			format = hlsConfigure(cwd, format, stream, "opus")
 			if stream.CodecName == "ac3" {
 				if stream.ChannelLayout == "5.1(side)" {
 					format.codecParams = append(format.codecParams, "-af", "channelmap=channel_layout=5.1")
