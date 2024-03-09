@@ -2,6 +2,7 @@ package internal
 
 import (
 	"encoding/json"
+	"log"
 	"os"
 	"path"
 	"strings"
@@ -37,6 +38,12 @@ func ExtractStream(cwd string, filepath string, stream *ProbeStream) (err error)
 	}
 
 	metaFilename := filename + ".json"
+
+	if _, err = os.Stat(metaFilename); err == nil {
+		log.Printf("File meta exists, skip\n")
+		return
+	}
+
 	data, err := json.Marshal(stream)
 	if err != nil {
 		return
