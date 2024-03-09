@@ -89,8 +89,13 @@ func FfmpegExtractStream(cwd string, filepath string, stream *ProbeStream) (file
 		stream.OrigCodecName = stream.CodecName
 		stream.CodecName = format.format
 
-		if stream.CodecName == "ac3" && stream.ChannelLayout == "5.1(side)" {
-			format.codecParams = append(format.codecParams, "-mapping_family=5.1")
+		if stream.OrigCodecName == "ac3" {
+			if stream.ChannelLayout == "5.1(side)" {
+				format.codecParams = append(format.codecParams, "-af", "channelmap=channel_layout=5.1")
+			}
+			if stream.ChannelLayout == "5.0(side)" {
+				format.codecParams = append(format.codecParams, "-af", "channelmap=channel_layout=5.0")
+			}
 		}
 	}
 
