@@ -21,9 +21,10 @@ type TargetFormat struct {
 
 var CODEC_TARGET_FORMAT = map[string]TargetFormat{
 	"h264": {
-		codec:  "copy",
-		format: "h264",
-		ext:    "m4v",
+		codec:       "copy",
+		codecParams: []string{"-bsf:v", "h264_mp4toannexb"},
+		format:      "h264",
+		ext:         "m4v",
 	},
 	"subrip": {
 		codec:  "",
