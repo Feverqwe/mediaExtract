@@ -17,8 +17,8 @@ type TargetFormat struct {
 
 var CODEC_TARGET_FORMAT = map[string]TargetFormat{
 	"subrip": {
-		format: "srt",
-		ext:    "srt",
+		format: "webvtt",
+		ext:    "vtt",
 	},
 }
 
@@ -88,7 +88,7 @@ func FfmpegExtractStream(cwd string, filepath string, stream ProbeStream) (filen
 
 	tmpFilename := filename + ".tmp"
 
-	process := exec.Command("ffmpeg", "-y", "-i", filepath, "-map", "0:"+strconv.Itoa(stream.Index), "-c", "copy", "-f", format.format, tmpFilename)
+	process := exec.Command("ffmpeg", "-y", "-i", filepath, "-map", "0:"+strconv.Itoa(stream.Index), "-f", format.format, tmpFilename)
 	process.Dir = cwd
 
 	process.Env = os.Environ()
