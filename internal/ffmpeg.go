@@ -47,11 +47,12 @@ var CODEC_TARGET_FORMAT = []TargetFormat{
 		},
 	},
 	{
-		codecNames: []string{"hevc"},
-		codec:      "copy",
-		format:     "hls",
+		codecNames:  []string{"hevc"},
+		codec:       "copy",
+		codecParams: []string{"-bsf:v", "hevc_mp4toannexb"},
+		format:      "hls",
 		formatParams: []string{
-			"-hls_time", "10",
+			"-hls_time", "60",
 			"-hls_segment_filename", "sig.mp4",
 			"-hls_flags", "append_list+single_file+split_by_time",
 			"-hls_playlist_type", "event",
