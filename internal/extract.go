@@ -18,12 +18,14 @@ func Extract(filepath string) (err error) {
 	filename := path.Base(filepath)
 	name := strings.TrimSuffix(filename, path.Ext(filename))
 	placeName := name + ".media"
-	cwd := path.Join(path.Dir(filepath), placeName)
 
 	probe, err := ProbeFile(filepath)
 	if err != nil {
 		return
 	}
+
+	cwd := path.Join(path.Dir(filepath), placeName)
+	os.MkdirAll(cwd, DIR_PERM)
 
 	metaFilename := path.Join(cwd, "meta.json")
 	if _, err = os.Stat(metaFilename); err != nil {
@@ -38,8 +40,6 @@ func Extract(filepath string) (err error) {
 			return
 		}
 	}
-
-	os.MkdirAll(cwd, DIR_PERM)
 
 	var files []ProcessedFile
 
