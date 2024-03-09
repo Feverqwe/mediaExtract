@@ -89,7 +89,7 @@ func BuildMain(cwd string, files []ProcessedFile) (err error) {
 	}
 
 	data := strings.Join(lines, "\n")
-	err = os.WriteFile(filename, []byte(data))
+	err = os.WriteFile(filename, []byte(data), FILE_PERM)
 
 	return
 }
