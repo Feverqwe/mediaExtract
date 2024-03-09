@@ -21,12 +21,12 @@ type TargetFormat struct {
 
 func hlsConfigure(cwd string, format TargetFormat, stream *ProbeStream) TargetFormat {
 	idxStr := strconv.Itoa(stream.Index)
-	dirname := "data-" + idxStr
+	sigName := "sig-" + idxStr
 	/* if err := os.MkdirAll(path.Join(cwd, dirname), DIR_PERM); err != nil {
 		panic(err)
 	} */
 
-	format.formatParams = append(format.formatParams, "-hls_segment_filename", dirname+"/%06d.ts")
+	format.formatParams = append(format.formatParams, "-hls_segment_filename", sigName+".ts")
 	return format
 }
 
