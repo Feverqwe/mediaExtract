@@ -74,9 +74,10 @@ func BuildMain(cwd string, files []ProcessedFile) (err error) {
 	}
 
 	for _, f := range files {
-		switch f.stream.CodecName {
+		switch f.stream.CodecType {
 		case VIDEO_CODEC:
-			lines = append(lines, "#EXT-X-STREAM-INF:PROGRAM-ID=1", path.Base(f.filename))
+			filename := path.Base(f.filename)
+			lines = append(lines, "#EXT-X-STREAM-INF:PROGRAM-ID=1", filename)
 		case AUDIO_CODEC:
 			filename := path.Base(f.filename)
 			name := getStreamName(f.stream, filename)
