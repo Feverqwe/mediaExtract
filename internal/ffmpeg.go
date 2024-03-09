@@ -39,12 +39,21 @@ var CODEC_TARGET_FORMAT = map[string]TargetFormat{
 		},
 		ext: "m3u8",
 		configurate: func(cwd string, format TargetFormat, stream *ProbeStream) TargetFormat {
-			return hlsConfigure(cwd, format, stream, "ts")
+			return hlsConfigure(cwd, format, stream, ".m4v")
 		},
 	},
 	"subrip": {
 		format: "webvtt",
-		ext:    "vtt",
+		formatParams: []string{
+			"-hls_time", "10",
+			"-hls_segment_filename", "sig.ts",
+			"-hls_flags", "append_list+single_file",
+			"-hls_playlist_type", "event",
+		},
+		ext: "m3u8",
+		configurate: func(cwd string, format TargetFormat, stream *ProbeStream) TargetFormat {
+			return hlsConfigure(cwd, format, stream, ".vtt")
+		},
 	},
 	"ac3": {
 		codec:       "libfdk_aac",
