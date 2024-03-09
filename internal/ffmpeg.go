@@ -38,6 +38,7 @@ type ProbeStream struct {
 	CodecName     string            `json:"codec_name"`
 	CodecType     string            `json:"codec_type"`
 	Tags          map[string]string `json:"tags"`
+	ChannelLayout string            `json:"channel_layout"`
 }
 
 type ProbeFormat struct {
@@ -87,6 +88,10 @@ func FfmpegExtractStream(cwd string, filepath string, stream *ProbeStream) (file
 		format = val
 		stream.OrigCodecName = stream.CodecName
 		stream.CodecName = format.format
+
+		if stream.CodecName == "ac3" && stream.ChannelLayout == "5.1(side)" {
+			format.codecParams = append(format.codecParams, "-af", "channelmap=channel_layout=5.1")
+		}
 	}
 
 	name := strconv.Itoa(stream.Index) + "." + format.ext
