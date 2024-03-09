@@ -90,7 +90,7 @@ func FfmpegExtractStream(cwd string, filepath string, stream *ProbeStream) (file
 		stream.CodecName = format.format
 
 		if stream.CodecName == "ac3" && stream.ChannelLayout == "5.1(side)" {
-			format.codecParams = append(format.codecParams, "-af", "channelmap=channel_layout=5.1")
+			format.codecParams = append(format.codecParams, "-mapping_family=5.1")
 		}
 	}
 
@@ -120,7 +120,7 @@ func FfmpegExtractStream(cwd string, filepath string, stream *ProbeStream) (file
 
 	args = append(args, tmpFilename)
 
-	log.Printf("Run ffmpeg with args: %s\n", args)
+	log.Printf("Run ffmpeg with args: %v\n", args)
 
 	process := exec.Command("ffmpeg", args...)
 	process.Dir = cwd
