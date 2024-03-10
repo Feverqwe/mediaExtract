@@ -121,6 +121,8 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (pro
 		}
 
 		index := len(streams)
+		typeIndex := audioStreamIdx
+		audioStreamIdx++
 		name := fmt.Sprintf("%d.m3u8", index)
 		if codecArgs, err = getCodecArgs(stream.CodecName); err != nil {
 			return
@@ -129,11 +131,10 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (pro
 			name:            name,
 			index:           index,
 			codecTypePrefix: "a",
-			codecTypeIdx:    audioStreamIdx,
+			codecTypeIdx:    typeIndex,
 			codecArgs:       codecArgs,
 			stream:          stream,
 		})
-		audioStreamIdx++
 	}
 	if audioStreamIdx == 0 {
 		err = fmt.Errorf("audio streams is empty")
