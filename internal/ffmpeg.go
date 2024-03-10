@@ -143,14 +143,14 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream, aLan
 		return
 	}
 
-	var subtitleStream []FloatStream
+	var subtitleStreams []FloatStream
 	for _, stream := range getStreamsByType(probeStreams, SUBTITLE_CODEC) {
 		language := stream.Tags["language"]
 		if len(sLangs) > 0 && !ArrayContain(sLangs, language) {
 			continue
 		}
 
-		index := len(subtitleStream) + len(streams)
+		index := len(subtitleStreams) + len(streams)
 
 		format, ok := getFormat(stream.CodecName)
 		if !ok {
@@ -160,7 +160,7 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream, aLan
 
 		plName := fmt.Sprintf("%d.m3u8", index)
 		name := fmt.Sprintf("%d.%s", index, format.ext)
-		subtitleStream = append(subtitleStream, FloatStream{
+		subtitleStreams = append(subtitleStreams, FloatStream{
 			index:  index,
 			plName: plName,
 			name:   name,
@@ -169,12 +169,12 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream, aLan
 			ext:    format.ext,
 		})
 	}
-	if len(subtitleStream) == 0 {
+	if len(subtitleStreams) == 0 {
 		err = fmt.Errorf("subtitles is empty")
 		return
 	}
 
-	for _, stream := range append(streams, subtitleStream...) {
+	for _, stream := range append(streams, subtitleStreams...) {
 		processedStreams = append(processedStreams, ProcessedStream{
 			filename: path.Join(cwd, stream.plName),
 			stream:   stream.stream,
@@ -225,7 +225,7 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream, aLan
 		"%v.m3u8",
 	)
 
-	for _, stream := range subtitleStream {
+	for _, stream := range subtitleStreams {
 		index := stream.index
 		if codecArgs, err = getCodecArgs(stream.stream.CodecName); err != nil {
 			return
@@ -254,7 +254,7 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream, aLan
 		return
 	}
 
-	for _, stream := range subtitleStream {
+	for _, stream := range subtitleStreams {
 		plName := stream.plName
 		plFilename := path.Join(cwd, plName)
 
