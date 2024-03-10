@@ -237,7 +237,7 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream, aLan
 	hlsFlags := []string{"append_list", "single_file"}
 	if hasHavc {
 		segmentType = "fmp4"
-		hlsFlags = append(hlsFlags, "split_by_time")
+		// hlsFlags = append(hlsFlags, "split_by_time")
 	}
 
 	args = append(args,
