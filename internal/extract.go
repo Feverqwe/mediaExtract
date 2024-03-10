@@ -34,7 +34,7 @@ func Extract(filepath string) (err error) {
 		}
 	}
 
-	if err = FfmpegExtractStreams(cwd, filename, probe.Streams); err != nil {
+	if err = FfmpegExtractStreams(cwd, filepath, probe.Streams); err != nil {
 		return
 	}
 
