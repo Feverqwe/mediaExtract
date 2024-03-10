@@ -175,7 +175,6 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (err
 	varStreamMap := strings.Join(varStreamMapItems, " ")
 
 	filename := path.Join(cwd, "main.m3u8")
-	tmpFilename := filename + ".tmp"
 
 	args = append(args,
 		"-f", "hls",
@@ -185,7 +184,7 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (err
 		"-hls_segment_type", "fmp4",
 		"-hls_flags", "append_list+single_file",
 		"-hls_playlist_type", "event",
-		"-master_pl_name", path.Base(tmpFilename),
+		"-master_pl_name", path.Base(filename),
 		"%v.m3u8",
 	)
 
@@ -202,7 +201,7 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (err
 		return
 	}
 
-	err = os.Rename(tmpFilename, filename)
+	err = os.Rename(filename, filename)
 
 	return
 }
