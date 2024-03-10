@@ -155,6 +155,10 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream, aLan
 
 	var subtitleStreams []FloatStream
 	for _, stream := range getStreamsByType(probeStreams, SUBTITLE_CODEC) {
+		if ArrayContain(SKIP_CODECS, stream.CodecName) {
+			continue
+		}
+
 		language := stream.Tags["language"]
 		if len(sLangs) > 0 && !ArrayContain(sLangs, language) {
 			continue

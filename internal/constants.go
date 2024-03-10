@@ -9,4 +9,4 @@ const SUBTITLE_CODEC = "subtitle"
 
 const STREAM_POINT = "streams_extracted"
 
-var SKIP_CODECS = []string{"mjpeg"}
+var SKIP_CODECS = []string{"mjpeg", "hdmv_pgs_subtitle"}
