@@ -93,7 +93,7 @@ type ProcessedStream struct {
 	stream   *ProbeStream
 }
 
-func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (processedStreams []ProcessedStream, err error) {
+func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream, aLangs []string, sLangs []string) (processedStreams []ProcessedStream, err error) {
 	var streams []FloatStream
 	var codecArgs []string
 
@@ -116,7 +116,7 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (pro
 	var audioStreamIdx = 0
 	for _, stream := range getStreamsByType(probeStreams, AUDIO_CODEC) {
 		language := stream.Tags["language"]
-		if !ArrayContain(AUDOI_LANGUAGES, language) {
+		if len(aLangs) > 0 && !ArrayContain(aLangs, language) {
 			continue
 		}
 
@@ -144,7 +144,7 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (pro
 	var subtitleStream []FloatStream
 	for _, stream := range getStreamsByType(probeStreams, SUBTITLE_CODEC) {
 		language := stream.Tags["language"]
-		if !ArrayContain(SUBTITLE_LANGUAGES, language) {
+		if len(sLangs) > 0 && !ArrayContain(sLangs, language) {
 			continue
 		}
 

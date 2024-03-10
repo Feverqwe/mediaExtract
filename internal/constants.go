@@ -7,7 +7,4 @@ const VIDEO_CODEC = "video"
 const AUDIO_CODEC = "audio"
 const SUBTITLE_CODEC = "subtitle"
 
-var AUDOI_LANGUAGES = []string{"eng"}
-var SUBTITLE_LANGUAGES = []string{"eng", "rus"}
-
 const STREAM_POINT = "streams_extracted"
