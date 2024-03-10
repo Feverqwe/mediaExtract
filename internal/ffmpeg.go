@@ -93,8 +93,6 @@ type ProcessedStream struct {
 	stream   *ProbeStream
 }
 
-const STREAM_POINT = "streams_extracted"
-
 func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (processedStreams []ProcessedStream, err error) {
 	var streams []FloatStream
 	var codecArgs []string
@@ -115,7 +113,14 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (pro
 		})
 	}
 
+	var audioStreamCount = 0
 	for idx, stream := range getStreamsByType(probeStreams, AUDIO_CODEC) {
+		language := stream.Tags["language"]
+		if !ArrayContain(AUDOI_LANGUAGES, language) {
+			continue
+		}
+
+		audioStreamCount++
 		index := len(streams)
 		name := fmt.Sprintf("%d.m3u8", index)
 		if codecArgs, err = getCodecArgs(stream.CodecName); err != nil {
@@ -130,9 +135,18 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (pro
 			stream:          stream,
 		})
 	}
+	if audioStreamCount == 0 {
+		err = fmt.Errorf("audio streams is empty")
+		return
+	}
 
 	var subtitleStream []FloatStream
 	for _, stream := range getStreamsByType(probeStreams, SUBTITLE_CODEC) {
+		language := stream.Tags["language"]
+		if !ArrayContain(SUBTITLE_LANGUAGES, language) {
+			continue
+		}
+
 		index := len(streams)
 
 		format, ok := getFormat(stream.CodecName)
@@ -148,6 +162,10 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (pro
 			stream: stream,
 			format: format.format,
 		})
+	}
+	if len(subtitleStream) == 0 {
+		err = fmt.Errorf("subtitles is empty")
+		return
 	}
 
 	for _, stream := range append(streams, subtitleStream...) {
