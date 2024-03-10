@@ -42,17 +42,6 @@ func Extract(filepath string) (err error) {
 		return
 	}
 
-	for _, stream := range getStreamsByType(probe.Streams, SUBTITLE_CODEC) {
-		var filename string
-		if filename, err = FfmpegExtractSubtitleStream(cwd, filepath, stream); err != nil {
-			return
-		}
-		processedStreams = append(processedStreams, ProcessedStream{
-			filename: filename,
-			stream:   stream,
-		})
-	}
-
 	err = BuildMain(cwd, processedStreams)
 
 	return
