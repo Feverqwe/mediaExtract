@@ -181,14 +181,17 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (err
 		"-f", "hls",
 		"-var_stream_map", varStreamMap,
 		"-hls_time", "10",
-		"-strftime_mkdir", "1",
-		"-hls_segment_filename", "%v.ts",
+		"-hls_segment_filename", "data/%v.ts",
 		"-hls_segment_type", "fmp4",
 		"-hls_flags", "append_list+single_file",
 		"-hls_playlist_type", "event",
 		"-master_pl_name", path.Base(tmpFilename),
-		"%v.m3u8",
+		"data/%v.m3u8",
 	)
+
+	if err = os.MkdirAll(path.Join(cwd, "data"), DIR_PERM); err != nil {
+		return
+	}
 
 	log.Printf("Run ffmpeg with args: %v\n", args)
 
