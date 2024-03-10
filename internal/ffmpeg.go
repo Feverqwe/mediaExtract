@@ -92,6 +92,8 @@ type ProcessedStream struct {
 	stream   *ProbeStream
 }
 
+const STREAM_POINT = "streams_extracted"
+
 func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (processedStreams []ProcessedStream, err error) {
 	var streams []FloatStream
 	var codecArgs []string
@@ -135,14 +137,7 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (pro
 		})
 	}
 
-	exists := true
-	for _, stream := range processedStreams {
-		if _, err = os.Stat(path.Join(cwd, stream.filename)); err != nil {
-			exists = false
-			break
-		}
-	}
-	if exists {
+	if _, err = os.Stat(path.Join(cwd, STREAM_POINT)); err == nil {
 		return
 	}
 
@@ -198,6 +193,8 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (pro
 	if err = process.Run(); err != nil {
 		return
 	}
+
+	err = os.WriteFile(path.Join(cwd, STREAM_POINT), []byte(""), FILE_PERM)
 
 	return
 }
