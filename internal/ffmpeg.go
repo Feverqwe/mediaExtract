@@ -169,7 +169,7 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (err
 	var varStreamMapItems []string
 	for _, stream := range streams {
 		name := getStreamName(stream.stream)
-		val := fmt.Sprintf("%s:%d,agroup:main,name:"+name, stream.codecTypePrefix, stream.codecTypeIdx)
+		val := fmt.Sprintf("%s:%d,agroup:main,name:\"%s\"", stream.codecTypePrefix, stream.codecTypeIdx, name)
 		varStreamMapItems = append(varStreamMapItems, val)
 	}
 	varStreamMap := strings.Join(varStreamMapItems, " ")
