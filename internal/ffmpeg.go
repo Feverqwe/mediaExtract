@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"strconv"
 	"strings"
 )
 
@@ -107,7 +106,7 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (err
 	var codecArgs []string
 
 	for idx, stream := range getStreamsByType(probeStreams, VIDEO_CODEC) {
-		if codecArgs, err = getCodecArgs(idx, stream.CodecName); err != nil {
+		if codecArgs, err = getCodecArgs(stream.CodecName); err != nil {
 			return
 		}
 		streams = append(streams, FloatStream{
@@ -120,7 +119,7 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (err
 	}
 
 	for idx, stream := range getStreamsByType(probeStreams, AUDIO_CODEC) {
-		if codecArgs, err = getCodecArgs(idx, stream.CodecName); err != nil {
+		if codecArgs, err = getCodecArgs(stream.CodecName); err != nil {
 			return
 		}
 		streams = append(streams, FloatStream{
@@ -133,7 +132,7 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (err
 	}
 
 	for idx, stream := range getStreamsByType(probeStreams, SUBTITLE_CODEC) {
-		if codecArgs, err = getCodecArgs(idx, stream.CodecName); err != nil {
+		if codecArgs, err = getCodecArgs(stream.CodecName); err != nil {
 			return
 		}
 		streams = append(streams, FloatStream{
@@ -173,6 +172,7 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (err
 		"-f", "hls",
 		"-var_stream_map", varStreamMap,
 		"-hls_time", "10",
+		"-strftime_mkdir", "1",
 		"-hls_segment_filename", "%v.ts",
 		"-hls_segment_type", "fmp4",
 		"-hls_flags", "append_list+single_file",
@@ -199,16 +199,14 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (err
 	return
 }
 
-func getCodecArgs(idx int, codecName string) (codecArgs []string, err error) {
+func getCodecArgs(codecName string) (codecArgs []string, err error) {
 	format, ok := getFormat(codecName)
 	if !ok {
 		err = fmt.Errorf("unsupported codec: %s", codecName)
 		return
 	}
 
-	if len(format.codec) > 0 {
-		codecArgs = append(codecArgs, "-codec:"+strconv.Itoa(idx), format.codec)
-	}
+	codecArgs = append(codecArgs, format.codec)
 	if len(format.codecParams) > 0 {
 		codecArgs = append(codecArgs, format.codecParams...)
 	}
