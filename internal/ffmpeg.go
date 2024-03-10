@@ -131,7 +131,7 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (err
 		})
 	}
 
-	for idx, stream := range getStreamsByType(probeStreams, SUBTITLE_CODEC) {
+	/* for idx, stream := range getStreamsByType(probeStreams, SUBTITLE_CODEC) {
 		if codecArgs, err = getCodecArgs(stream.CodecName); err != nil {
 			return
 		}
@@ -142,7 +142,7 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (err
 			codecArgs:       codecArgs,
 			stream:          stream,
 		})
-	}
+	} */
 
 	const INPUT_INDEX = 0
 	args := []string{"-hide_banner", "-y", "-i", filepath}
@@ -157,7 +157,7 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (err
 		if bps, ok := stream.stream.Tags["BPS"]; ok {
 			bitrate = bps
 		}
-		key := fmt.Sprintf("-b:%s:%d", stream.codecTypePrefix, stream.codecTypeIdx)
+		key := fmt.Sprintf("-b:%d", stream.index)
 		args = append(args, key, bitrate)
 	}
 
