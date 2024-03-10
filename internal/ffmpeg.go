@@ -28,7 +28,7 @@ var CODEC_TARGET_FORMAT = []TargetFormat{
 		codecParams: []string{"-vbr", "5"},
 	}, {
 		codecNames: []string{"subrip"},
-		codec:      "",
+		codec:      "webvtt",
 		format:     "webvtt",
 		ext:        "vtt",
 	},
