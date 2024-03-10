@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"mediaExtract/internal"
 	"path/filepath"
@@ -11,7 +10,7 @@ import (
 type arrayFlags []string
 
 func (i *arrayFlags) String() string {
-	return fmt.Sprintf("%v", i)
+	return "<list>"
 }
 
 func (i *arrayFlags) Set(value string) error {
