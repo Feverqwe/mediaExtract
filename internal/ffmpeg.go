@@ -231,7 +231,7 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream, aLan
 	args = append(args,
 		"-f", "hls",
 		"-var_stream_map", varStreamMap,
-		"-hls_time", "2",
+		"-hls_time", "10",
 		"-hls_segment_filename", "%v.ts",
 		"-hls_segment_type", "fmp4",
 		"-hls_flags", "append_list+single_file+split_by_time",
