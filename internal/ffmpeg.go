@@ -36,7 +36,6 @@ var CODEC_TARGET_FORMAT = []TargetFormat{
 
 type ProbeStream struct {
 	Index         int               `json:"index"`
-	OrigCodecName string            `json:"orig_codec_name"`
 	CodecName     string            `json:"codec_name"`
 	CodecType     string            `json:"codec_type"`
 	Tags          map[string]string `json:"tags"`
