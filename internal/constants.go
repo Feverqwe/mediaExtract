@@ -8,3 +8,5 @@ const AUDIO_CODEC = "audio"
 const SUBTITLE_CODEC = "subtitle"
 
 const STREAM_POINT = "streams_extracted"
+
+var SKIP_CODECS = []string{"mjpeg"}
