@@ -113,14 +113,13 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (pro
 		})
 	}
 
-	var audioStreamCount = 0
-	for idx, stream := range getStreamsByType(probeStreams, AUDIO_CODEC) {
+	var audioStreamIdx = 0
+	for _, stream := range getStreamsByType(probeStreams, AUDIO_CODEC) {
 		language := stream.Tags["language"]
 		if !ArrayContain(AUDOI_LANGUAGES, language) {
 			continue
 		}
 
-		audioStreamCount++
 		index := len(streams)
 		name := fmt.Sprintf("%d.m3u8", index)
 		if codecArgs, err = getCodecArgs(stream.CodecName); err != nil {
@@ -130,12 +129,13 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (pro
 			name:            name,
 			index:           index,
 			codecTypePrefix: "a",
-			codecTypeIdx:    idx,
+			codecTypeIdx:    audioStreamIdx,
 			codecArgs:       codecArgs,
 			stream:          stream,
 		})
+		audioStreamIdx++
 	}
-	if audioStreamCount == 0 {
+	if audioStreamIdx == 0 {
 		err = fmt.Errorf("audio streams is empty")
 		return
 	}
