@@ -14,38 +14,23 @@ type TargetFormat struct {
 	codecNames  []string
 	codec       string
 	codecParams []string
+	format      string
+	ext         string
 }
 
 var CODEC_TARGET_FORMAT = []TargetFormat{
 	{
 		codecNames: []string{"h264", "hevc"},
 		codec:      "copy",
-	},
-	{
-		codecNames: []string{"subrip"},
-		codec:      "webvtt",
-		/* format:     "webvtt",
-		ext:        "vtt",
-		postProcess: func(cwd, filepath string) (filename string, err error) {
-			filename = strings.TrimSuffix(filepath, path.Ext(filepath)) + ".m3u8"
-			if _, err = os.Stat(filename); err == nil {
-				return
-			}
-
-			data := strings.Join([]string{
-				"#EXTM3U",
-				"#EXT-X-TARGETDURATION:0",
-				"#EXT-X-PLAYLIST-TYPE:VOD",
-				path.Base(filepath),
-				"#EXT-X-ENDLIST",
-			}, "\n")
-			err = os.WriteFile(filename, []byte(data), FILE_PERM)
-			return
-		}, */
 	}, {
 		codecNames:  []string{"ac3", "eac3"},
 		codec:       "libfdk_aac",
 		codecParams: []string{"-vbr", "5"},
+	}, {
+		codecNames: []string{"subrip"},
+		codec:      "webvtt",
+		format:     "webvtt",
+		ext:        "vtt",
 	},
 }
 
@@ -131,19 +116,6 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (err
 		})
 	}
 
-	/* for idx, stream := range getStreamsByType(probeStreams, SUBTITLE_CODEC) {
-		if codecArgs, err = getCodecArgs(stream.CodecName); err != nil {
-			return
-		}
-		streams = append(streams, FloatStream{
-			index:           len(streams),
-			codecTypePrefix: "s",
-			codecTypeIdx:    idx,
-			codecArgs:       codecArgs,
-			stream:          stream,
-		})
-	} */
-
 	const INPUT_INDEX = 0
 	args := []string{"-hide_banner", "-y", "-i", filepath}
 
@@ -201,8 +173,56 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (err
 		return
 	}
 
-	err = os.Rename(filename, filename)
+	return
+}
 
+func FfmpegExtractSubtitleStream(cwd, filepath string, stream *ProbeStream) (err error) {
+	const INPUT_INDEX = 0
+
+	format, ok := getFormat(stream.CodecName)
+	if !ok {
+		err = fmt.Errorf("unsupported codec: %s", stream.CodecName)
+		return
+	}
+
+	name := fmt.Sprintf("s-%d.%s", stream.Index, format.ext)
+	filename := path.Join(cwd, name)
+
+	args := []string{"-hide_banner", "-y",
+		"-i", filepath,
+		"-map", fmt.Sprintf("%d:%d", INPUT_INDEX, stream.Index),
+		"-c", format.codec,
+	}
+	args = append(args, format.codecParams...)
+	args = append(args, "-f", format.format, filename)
+
+	log.Printf("Run ffmpeg with args: %v\n", args)
+
+	process := exec.Command("ffmpeg", args...)
+	process.Dir = cwd
+
+	process.Env = os.Environ()
+	process.Stdout = os.Stdout
+	process.Stderr = os.Stderr
+
+	if err = process.Run(); err != nil {
+		return
+	}
+
+	plName := fmt.Sprintf("s-%d.m3u8", stream.Index)
+	plFilename := path.Join(cwd, plName)
+	if _, err = os.Stat(plFilename); err == nil {
+		return
+	}
+
+	data := strings.Join([]string{
+		"#EXTM3U",
+		"#EXT-X-TARGETDURATION:0",
+		"#EXT-X-PLAYLIST-TYPE:VOD",
+		name,
+		"#EXT-X-ENDLIST",
+	}, "\n")
+	err = os.WriteFile(plFilename, []byte(data), FILE_PERM)
 	return
 }
 
