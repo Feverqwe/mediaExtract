@@ -97,11 +97,16 @@ type ProcessedStream struct {
 func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream, aLangs []string, sLangs []string) (processedStreams []ProcessedStream, err error) {
 	var streams []FloatStream
 	var codecArgs []string
+	var hasHavc = false
 
 	var videoStreamIdx = 0
 	for _, stream := range getStreamsByType(probeStreams, VIDEO_CODEC) {
 		if ArrayContain(SKIP_CODECS, stream.CodecName) {
 			continue
+		}
+
+		if stream.CodecName == "hevc" {
+			hasHavc = true
 		}
 
 		index := len(streams)
@@ -228,13 +233,20 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream, aLan
 	}
 	varStreamMap := strings.Join(varStreamMapItems, " ")
 
+	segmentType := "mpegts"
+	hlsFlags := []string{"append_list", "single_file"}
+	if hasHavc {
+		segmentType = "fmp4"
+		hlsFlags = append(hlsFlags, "split_by_time")
+	}
+
 	args = append(args,
 		"-f", "hls",
 		"-var_stream_map", varStreamMap,
 		"-hls_time", "10",
 		"-hls_segment_filename", "%v.ts",
-		"-hls_segment_type", "fmp4",
-		"-hls_flags", "append_list+single_file+split_by_time",
+		"-hls_segment_type", segmentType,
+		"-hls_flags", strings.Join(hlsFlags, "+"),
 		"-hls_playlist_type", "event",
 		"%v.m3u8",
 	)
