@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"log"
 	"mediaExtract/internal"
 	"path/filepath"
 )
@@ -20,6 +21,6 @@ func main() {
 
 	err = internal.Extract(filename)
 	if err != nil {
-		panic(err)
+		log.Panic(err)
 	}
 }
