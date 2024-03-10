@@ -153,6 +153,15 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (err
 	}
 
 	for _, stream := range streams {
+		bitrate := "1"
+		if bps, ok := stream.stream.Tags["BPS"]; ok {
+			bitrate = bps
+		}
+		key := fmt.Sprintf("-b:%s:%d", stream.codecTypePrefix, stream.codecTypeIdx)
+		args = append(args, key, bitrate)
+	}
+
+	for _, stream := range streams {
 		codecKey := fmt.Sprintf("-codec:%d", stream.index)
 		args = append(append(args, codecKey), stream.codecArgs...)
 	}
@@ -177,7 +186,7 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (err
 		"-hls_segment_type", "fmp4",
 		"-hls_flags", "append_list+single_file",
 		"-hls_playlist_type", "event",
-		"-master_pl_name", tmpFilename,
+		"-master_pl_name", path.Base(tmpFilename),
 		"data/%v.m3u8",
 	)
 
