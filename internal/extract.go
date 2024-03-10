@@ -37,8 +37,8 @@ func Extract(filepath string, aLangs []string, sLangs []string) (err error) {
 		}
 	}
 
-	var processedStreams []ProcessedStream
-	if processedStreams, err = FfmpegExtractStreams(cwd, filepath, probe.Streams, aLangs, sLangs); err != nil {
+	processedStreams, err := FfmpegExtractStreams(cwd, filepath, probe.Streams, aLangs, sLangs)
+	if err != nil {
 		return
 	}
 
