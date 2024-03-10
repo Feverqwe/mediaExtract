@@ -131,7 +131,7 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (err
 		})
 	}
 
-	/* for idx, stream := range getStreamsByType(probeStreams, SUBTITLE_CODEC) {
+	for idx, stream := range getStreamsByType(probeStreams, SUBTITLE_CODEC) {
 		if codecArgs, err = getCodecArgs(stream.CodecName); err != nil {
 			return
 		}
@@ -142,7 +142,7 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (err
 			codecArgs:       codecArgs,
 			stream:          stream,
 		})
-	} */
+	}
 
 	const INPUT_INDEX = 0
 	args := []string{"-hide_banner", "-y", "-i", filepath}
@@ -169,7 +169,7 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (err
 	var varStreamMapItems []string
 	for _, stream := range streams {
 		// name := getStreamName(stream.stream)
-		val := fmt.Sprintf("%s:%d,agroup:main", stream.codecTypePrefix, stream.codecTypeIdx)
+		val := fmt.Sprintf("%s:%d,vgroup:main,agroup:main,sgroup:main", stream.codecTypePrefix, stream.codecTypeIdx)
 		varStreamMapItems = append(varStreamMapItems, val)
 	}
 	varStreamMap := strings.Join(varStreamMapItems, " ")
