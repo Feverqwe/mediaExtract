@@ -186,7 +186,7 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream) (err
 		"-hls_flags", "append_list+single_file",
 		"-hls_playlist_type", "event",
 		"-master_pl_name", path.Base(tmpFilename),
-		"data/%v.m3u8",
+		"%v.m3u8",
 	)
 
 	if err = os.MkdirAll(path.Join(cwd, "data"), DIR_PERM); err != nil {
