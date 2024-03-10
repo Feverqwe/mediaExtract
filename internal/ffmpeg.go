@@ -148,7 +148,7 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream, aLan
 			continue
 		}
 
-		index := len(subtitleStream)
+		index := len(subtitleStream) + len(streams)
 
 		format, ok := getFormat(stream.CodecName)
 		if !ok {
@@ -221,7 +221,7 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream, aLan
 	)
 
 	for _, stream := range subtitleStream {
-		index := len(streams)
+		index := stream.index
 		if codecArgs, err = getCodecArgs(stream.stream.CodecName); err != nil {
 			return
 		}
