@@ -56,7 +56,7 @@ type ProbeResult struct {
 func ProbeFile(filepath string) (result *ProbeResult, err error) {
 	log.Printf("Probe file %s\n", filepath)
 
-	process := exec.Command("ffprobe", "-hide_banner", "-i", filepath, "-print_format", "json", "-show_format", "-show_streams")
+	process := exec.Command("ffprobe", "-loglevel", "warning", "-hide_banner", "-i", filepath, "-print_format", "json", "-show_format", "-show_streams")
 
 	process.Env = os.Environ()
 	process.Stderr = os.Stderr
