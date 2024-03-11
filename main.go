@@ -28,7 +28,7 @@ var COMMAND = []string{COMMAND_FILE, COMMAND_DIR}
 func main() {
 	var err error
 
-	var filenameRel string
+	var filename string
 	var aLangs arrayFlags
 	var sLangs arrayFlags
 	var hlsSplitByTime bool
@@ -36,15 +36,17 @@ func main() {
 	var hlsSegmentType string
 	var hlsMasterPlaylistName string
 
+	offset := 1
 	command := COMMAND_FILE
 	if len(os.Args) > 1 && internal.ArrayContain(COMMAND, os.Args[1]) {
+		offset += 1
 		command = os.Args[1]
 	}
 
 	f := flag.NewFlagSet(fmt.Sprintf("%s %s", os.Args[0], command), flag.ExitOnError)
 	switch command {
 	case COMMAND_FILE:
-		f.StringVar(&filenameRel, "f", "", "Media file")
+		f.StringVar(&filename, "f", "", "Media file")
 		f.Var(&aLangs, "al", "Add audio language filter")
 		f.Var(&sLangs, "sl", "Add subtilte language filter")
 		f.IntVar(&hlsTime, "hlsTime", 10, "Set hls segment time")
@@ -52,16 +54,16 @@ func main() {
 		f.StringVar(&hlsSegmentType, "hlsSegmentType", "", "Force set hls segment type: mpegts or fmp4")
 		f.StringVar(&hlsMasterPlaylistName, "hlsMasterPlaylistName", "", "Create HLS master playlist with the given name")
 	}
-	f.Parse(os.Args[1:])
+	f.Parse(os.Args[offset:])
 
-	if filenameRel == "" {
-		log.Panicf("Please provide \"%s\" argument", "-f")
+	if filename == "" {
+		log.Printf("Please provide \"%s\" argument\n", "-f")
 		return
 	}
 
-	filename, err := filepath.Abs(filenameRel)
-	if err != nil {
-		panic(err)
+	if filename, err = filepath.Abs(filename); err != nil {
+		log.Fatal(err)
+		return
 	}
 
 	options := internal.NewOptions(
@@ -75,6 +77,7 @@ func main() {
 
 	err = internal.Extract(filename, options)
 	if err != nil {
-		log.Panic(err)
+		log.Fatal(err)
+		return
 	}
 }
