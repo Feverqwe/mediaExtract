@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-func Extract(filepath string, aLangs []string, sLangs []string) (err error) {
+func Extract(filepath string, options Options) (err error) {
 	filename := path.Base(filepath)
 	name := strings.TrimSuffix(filename, path.Ext(filename))
 	placeName := name + ".media"
@@ -37,7 +37,7 @@ func Extract(filepath string, aLangs []string, sLangs []string) (err error) {
 		}
 	}
 
-	processedStreams, err := FfmpegExtractStreams(cwd, filepath, probe.Streams, aLangs, sLangs)
+	processedStreams, err := FfmpegExtractStreams(cwd, filepath, probe.Streams, options)
 	if err != nil {
 		return
 	}

@@ -94,7 +94,7 @@ type ProcessedStream struct {
 	stream   *ProbeStream
 }
 
-func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream, aLangs []string, sLangs []string) (processedStreams []ProcessedStream, err error) {
+func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream, options Options) (processedStreams []ProcessedStream, err error) {
 	var streams []FloatStream
 	var codecArgs []string
 	var hasHavc = false
@@ -133,7 +133,7 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream, aLan
 	var audioStreamIdx = 0
 	for _, stream := range getStreamsByType(probeStreams, AUDIO_CODEC) {
 		language := stream.Tags["language"]
-		if len(aLangs) > 0 && !ArrayContain(aLangs, language) {
+		if len(options.aLangs) > 0 && !ArrayContain(options.aLangs, language) {
 			continue
 		}
 
@@ -165,7 +165,7 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream, aLan
 		}
 
 		language := stream.Tags["language"]
-		if len(sLangs) > 0 && !ArrayContain(sLangs, language) {
+		if len(options.sLangs) > 0 && !ArrayContain(options.sLangs, language) {
 			continue
 		}
 
@@ -237,19 +237,31 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream, aLan
 	hlsFlags := []string{"append_list", "single_file"}
 	if hasHavc {
 		segmentType = "fmp4"
-		// hlsFlags = append(hlsFlags, "split_by_time")
+	}
+	if options.hlsSegmentType != "" {
+		segmentType = options.hlsSegmentType
+	}
+	if options.hlsSplitByTime {
+		hlsFlags = append(hlsFlags, "split_by_time")
 	}
 
-	args = append(args,
+	formatArgs := []string{
 		"-f", "hls",
 		"-var_stream_map", varStreamMap,
-		"-hls_time", "10",
+		"-hls_time", fmt.Sprintf("%d", options.hlsTime),
 		"-hls_segment_filename", "%v.ts",
 		"-hls_segment_type", segmentType,
 		"-hls_flags", strings.Join(hlsFlags, "+"),
 		"-hls_playlist_type", "event",
-		"%v.m3u8",
-	)
+	}
+
+	if options.hlsMasterPlaylistName != "" {
+		formatArgs = append(formatArgs, "-master_pl_name", options.hlsMasterPlaylistName)
+	}
+
+	formatArgs = append(formatArgs, "%v.m3u8")
+
+	args = append(args, formatArgs...)
 
 	for _, stream := range subtitleStreams {
 		index := stream.index
