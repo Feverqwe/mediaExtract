@@ -126,7 +126,7 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream, opti
 		})
 	}
 	if videoStreamIdx == 0 {
-		err = fmt.Errorf("videos streams is empty")
+		err = fmt.Errorf("video streams is empty")
 		return
 	}
 
@@ -187,10 +187,6 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream, opti
 			format: format.format,
 			ext:    format.ext,
 		})
-	}
-	if len(subtitleStreams) == 0 {
-		err = fmt.Errorf("subtitles is empty")
-		return
 	}
 
 	for _, stream := range append(streams, subtitleStreams...) {
