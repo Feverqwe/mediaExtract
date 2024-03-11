@@ -36,10 +36,8 @@ func main() {
 	var hlsSegmentType string
 	var hlsMasterPlaylistName string
 
-	offset := 1
 	command := COMMAND_FILE
 	if len(os.Args) > 1 && internal.ArrayContain(COMMAND, os.Args[1]) {
-		offset += 1
 		command = os.Args[1]
 	}
 
@@ -54,7 +52,7 @@ func main() {
 		f.StringVar(&hlsSegmentType, "hlsSegmentType", "", "Force set hls segment type: mpegts or fmp4")
 		f.StringVar(&hlsMasterPlaylistName, "hlsMasterPlaylistName", "", "Create HLS master playlist with the given name")
 	}
-	f.Parse(os.Args[offset:])
+	f.Parse(os.Args[1:])
 
 	if filenameRel == "" {
 		log.Panicf("Please provide \"%s\" argument", "-f")
