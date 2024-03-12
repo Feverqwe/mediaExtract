@@ -7,23 +7,30 @@ import (
 	"strings"
 )
 
-func Extract(filepath string, options Options) (err error) {
-	filename := path.Base(filepath)
+func Extract(files []string, options Options) (err error) {
+	firstFilename := files[0]
+	filename := path.Base(firstFilename)
 	name := strings.TrimSuffix(filename, path.Ext(filename))
 	placeName := name + ".media"
 
-	probe, err := ProbeFile(filepath)
-	if err != nil {
-		return
+	var probeResults []*ProbeResult
+	var streams []ProbeStream
+	for idx, filename := range files {
+		var probe *ProbeResult
+		if probe, err = ProbeFile(idx, filename); err != nil {
+			return
+		}
+		streams = append(streams, probe.Streams...)
+		probeResults = append(probeResults, probe)
 	}
 
-	cwd := path.Join(path.Dir(filepath), placeName)
+	cwd := path.Join(path.Dir(firstFilename), placeName)
 	os.MkdirAll(cwd, DIR_PERM)
 
 	metaFilename := path.Join(cwd, "meta.json")
 	if _, err = os.Stat(metaFilename); err != nil {
 		var data []byte
-		data, err = json.MarshalIndent(probe, "", " ")
+		data, err = json.MarshalIndent(probeResults, "", " ")
 		if err != nil {
 			return
 		}
@@ -34,7 +41,7 @@ func Extract(filepath string, options Options) (err error) {
 		}
 	}
 
-	err = FfmpegExtractStreams(cwd, filepath, probe.Streams, options)
+	err = FfmpegExtractStreams(cwd, files, streams, options)
 
 	return
 }
