@@ -126,7 +126,7 @@ func FfmpegExtractStreams(cwd string, files []string, probeStreams []ProbeStream
 		usedInputs[stream.stream.inputIndex] = true
 	}
 
-	args := []string{"-hide_banner", "-loglevel", "warning", "-y"}
+	args := []string{"-hide_banner", "-loglevel", "warning", "-stats", "-y"}
 	for key := range usedInputs {
 		args = append(args, "-i", files[key])
 	}
