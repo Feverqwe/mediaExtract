@@ -11,49 +11,6 @@ import (
 	"strings"
 )
 
-type TargetFormat struct {
-	codecNames  []string
-	codec       string
-	codecParams []string
-	format      string
-	ext         string
-}
-
-var CODEC_TARGET_FORMAT = []TargetFormat{
-	{
-		codecNames: []string{"h264", "hevc"},
-		codec:      "copy",
-	}, {
-		codecNames:  []string{"ac3", "eac3", "dts"},
-		codec:       "libfdk_aac",
-		codecParams: []string{"-vbr", "5"},
-	}, {
-		codecNames: []string{"subrip"},
-		codec:      "webvtt",
-		format:     "webvtt",
-		ext:        "vtt",
-	},
-}
-
-type ProbeStream struct {
-	inputIndex    int
-	Index         int               `json:"index"`
-	CodecName     string            `json:"codec_name"`
-	CodecType     string            `json:"codec_type"`
-	Tags          map[string]string `json:"tags"`
-	ChannelLayout string            `json:"channel_layout"`
-}
-
-type ProbeFormat struct {
-	FormatName string            `json:"format_name"`
-	Tags       map[string]string `json:"tags"`
-}
-
-type ProbeResult struct {
-	Streams []ProbeStream `json:"streams"`
-	Format  ProbeFormat   `json:"format"`
-}
-
 func ProbeFile(inputIndex int, filename string) (result *ProbeResult, err error) {
 	log.Printf("Probe file %s\n", filename)
 
@@ -83,22 +40,6 @@ func ProbeFile(inputIndex int, filename string) (result *ProbeResult, err error)
 	return
 }
 
-type FloatStream struct {
-	index      int
-	inputIndex string
-	typeIndex  string
-	stream     *ProbeStream
-	format     *TargetFormat
-}
-
-func (s *FloatStream) getChunkName() string {
-	return fmt.Sprintf("%d.%s", s.index, s.format.ext)
-}
-
-func (s *FloatStream) getPlaylistName() string {
-	return fmt.Sprintf("%d.m3u8", s.index)
-}
-
 func FfmpegExtractStreams(cwd string, files []string, probeStreams []ProbeStream, options Options) (err error) {
 	streamIdx := 0
 	getStreamIdx := func() (idx int) {
@@ -117,18 +58,13 @@ func FfmpegExtractStreams(cwd string, files []string, probeStreams []ProbeStream
 		return
 	}
 
-	usedInputs := make(map[int]bool)
-	for i := range files {
-		usedInputs[i] = false
-	}
 	streams := append(hlsStreams, subtitleStreams...)
-	for _, stream := range streams {
-		usedInputs[stream.stream.inputIndex] = true
-	}
+
+	usedFiles := getUsedFiles(files, streams)
 
 	args := []string{"-hide_banner", "-loglevel", "warning", "-stats", "-y"}
-	for key := range usedInputs {
-		args = append(args, "-i", files[key])
+	for _, fileaname := range usedFiles {
+		args = append(args, "-i", fileaname)
 	}
 
 	args = append(args, hlsArgs...)
@@ -230,18 +166,13 @@ func getHlsArgs(_ string, getStreamIdx func() int, probeStreams []ProbeStream, o
 	}
 
 	for _, stream := range streams {
-		bitrate := "1"
-		if bps, ok := stream.stream.Tags["BPS"]; ok {
-			bitrate = bps
-		}
 		key := fmt.Sprintf("-b:%d", stream.index)
-		args = append(args, key, bitrate)
+		args = append(args, key, stream.getBitrate())
 	}
 
 	for _, stream := range streams {
 		codecKey := fmt.Sprintf("-codec:%d", stream.index)
-		codecArgs := getCodecArgs(*stream.format)
-		args = append(append(args, codecKey), codecArgs...)
+		args = append(append(args, codecKey), stream.getCodecArgs()...)
 	}
 
 	var varStreamMapItems []string
@@ -315,8 +246,7 @@ func getSubtitleArgs(cwd string, getStreamIdx func() int, probeStreams []ProbeSt
 		args = append(args, "-map", stream.inputIndex)
 		codecKey := fmt.Sprintf("-codec:%d", stream.index)
 		args = append(args, codecKey)
-		codecArgs := getCodecArgs(*stream.format)
-		args = append(args, codecArgs...)
+		args = append(args, stream.getCodecArgs()...)
 		format := stream.format.format
 		args = append(args, "-f", format, stream.getChunkName())
 	}
@@ -358,11 +288,11 @@ func buildMainPlaylist(cwd string, streams []FloatStream, name string) (err erro
 			lines = append(lines, "#EXT-X-STREAM-INF:PROGRAM-ID=1", filename)
 		case AUDIO_CODEC:
 			filename := path.Base(plFullName)
-			name := getStreamName(f.stream)
+			name := f.getStreamName()
 			lines = append(lines, fmt.Sprintf("#EXT-X-MEDIA:TYPE=AUDIO,NAME=\"%s\",URI=\"%s\"", name, url.QueryEscape(filename)))
 		case SUBTITLE_CODEC:
 			filename := path.Base(plFullName)
-			name := getStreamName(f.stream)
+			name := f.getStreamName()
 			lines = append(lines, fmt.Sprintf("#EXT-X-MEDIA:TYPE=SUBTITLES,NAME=\"%s\",URI=\"%s\"", name, url.QueryEscape(filename)))
 		}
 	}
@@ -370,28 +300,6 @@ func buildMainPlaylist(cwd string, streams []FloatStream, name string) (err erro
 	data := strings.Join(lines, "\n")
 	err = os.WriteFile(filename, []byte(data), FILE_PERM)
 
-	return
-}
-
-func getStreamName(stream *ProbeStream) string {
-	var parts []string
-	if language, ok := stream.Tags["language"]; ok {
-		parts = append(parts, language)
-	}
-	if title, ok := stream.Tags["title"]; ok {
-		parts = append(parts, title)
-	}
-	if len(parts) == 0 {
-		parts = append(parts, fmt.Sprintf("%d", stream.Index))
-	}
-	return strings.Join(parts, " - ")
-}
-
-func getCodecArgs(format TargetFormat) (codecArgs []string) {
-	codecArgs = append(codecArgs, format.codec)
-	if len(format.codecParams) > 0 {
-		codecArgs = append(codecArgs, format.codecParams...)
-	}
 	return
 }
 
@@ -413,6 +321,21 @@ func getStreamsByType(streams []ProbeStream, codecType string) (results []*Probe
 		if s.CodecType == codecType {
 			results = append(results, &streams[i])
 		}
+	}
+	return
+}
+
+func getUsedFiles(files []string, streams []FloatStream) (usedFiles []string) {
+	usedInputs := make(map[int]bool)
+	for i := range files {
+		usedInputs[i] = false
+	}
+	for _, stream := range streams {
+		usedInputs[stream.stream.inputIndex] = true
+	}
+
+	for i := range usedInputs {
+		usedFiles = append(usedFiles, files[i])
 	}
 	return
 }

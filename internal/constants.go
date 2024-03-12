@@ -8,3 +8,19 @@ const AUDIO_CODEC = "audio"
 const SUBTITLE_CODEC = "subtitle"
 
 var SKIP_CODECS = []string{"mjpeg", "hdmv_pgs_subtitle"}
+
+var CODEC_TARGET_FORMAT = []TargetFormat{
+	{
+		codecNames: []string{"h264", "hevc"},
+		codec:      "copy",
+	}, {
+		codecNames:  []string{"ac3", "eac3", "dts"},
+		codec:       "libfdk_aac",
+		codecParams: []string{"-vbr", "5"},
+	}, {
+		codecNames: []string{"subrip"},
+		codec:      "webvtt",
+		format:     "webvtt",
+		ext:        "vtt",
+	},
+}
