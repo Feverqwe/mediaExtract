@@ -48,7 +48,7 @@ func FfmpegExtractStreams(cwd string, files []string, probeStreams []ProbeStream
 		return
 	}
 
-	hlsStreams, hlsArgs, err := getHlsArgs(cwd, getStreamIdx, probeStreams, options)
+	hlsStreams, hlsArgs, err := getHlsArgs(getStreamIdx, probeStreams, options)
 	if err != nil {
 		return
 	}
@@ -99,7 +99,7 @@ func FfmpegExtractStreams(cwd string, files []string, probeStreams []ProbeStream
 	return
 }
 
-func getHlsArgs(_ string, getStreamIdx func() int, probeStreams []ProbeStream, options Options) (streams []FloatStream, args []string, err error) {
+func getHlsArgs(getStreamIdx func() int, probeStreams []ProbeStream, options Options) (streams []FloatStream, args []string, err error) {
 	var hasHavc bool
 
 	var videoStreamIdx = 0
