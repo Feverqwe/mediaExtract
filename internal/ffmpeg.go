@@ -230,8 +230,12 @@ func getHlsArgs(_ string, getStreamIdx func() int, probeStreams []ProbeStream, o
 	}
 
 	for _, stream := range streams {
+		bitrate := "1"
+		if bps, ok := stream.stream.Tags["BPS"]; ok {
+			bitrate = bps
+		}
 		key := fmt.Sprintf("-b:%d", stream.index)
-		args = append(args, key, "1")
+		args = append(args, key, bitrate)
 	}
 
 	for _, stream := range streams {
