@@ -44,9 +44,12 @@ func (s *FloatStream) getCodecArgs() (codecArgs []string) {
 }
 
 func (s *FloatStream) getBitrate() (bitrate string) {
-	bitrate = "1"
+	bitrate = s.stream.BitRate
 	if bps, ok := s.stream.Tags["BPS"]; ok {
 		bitrate = bps
+	}
+	if bitrate == "" {
+		bitrate = "1"
 	}
 	return
 }

@@ -34,6 +34,7 @@ type ProbeStream struct {
 	CodecType     string            `json:"codec_type"`
 	Tags          map[string]string `json:"tags"`
 	ChannelLayout string            `json:"channel_layout"`
+	BitRate       string            `json:"bit_rate"`
 }
 
 type ProbeFormat struct {
