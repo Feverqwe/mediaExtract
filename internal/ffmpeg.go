@@ -79,14 +79,18 @@ func ProbeFile(filepath string) (result *ProbeResult, err error) {
 }
 
 type FloatStream struct {
-	plName    string
-	name      string
-	index     int
-	typeIndex string
-	stream    *ProbeStream
-	codecArgs []string
-	format    string
-	ext       string
+	index        int
+	typeIndex    string
+	stream       *ProbeStream
+	targetFormat *TargetFormat
+}
+
+func (s *FloatStream) getChunkName() string {
+	return fmt.Sprintf("%d.%s", s.index, s.targetFormat.ext)
+}
+
+func (s *FloatStream) getPlaylistName() string {
+	return fmt.Sprintf("%d.m3u8", s.index)
 }
 
 func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream, options Options) (err error) {
@@ -119,14 +123,11 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream, opti
 		index := getStreamIdx()
 		typeIndex := videoStreamIdx
 		videoStreamIdx++
-		plName := fmt.Sprintf("%d.m3u8", index)
-		codecArgs := getCodecArgs(format)
 		streams = append(streams, FloatStream{
-			plName:    plName,
-			index:     index,
-			typeIndex: fmt.Sprintf("v:%d", typeIndex),
-			codecArgs: codecArgs,
-			stream:    stream,
+			index:        index,
+			typeIndex:    fmt.Sprintf("v:%d", typeIndex),
+			stream:       stream,
+			targetFormat: &format,
 		})
 	}
 	if videoStreamIdx == 0 {
@@ -149,14 +150,11 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream, opti
 		index := getStreamIdx()
 		typeIndex := audioStreamIdx
 		audioStreamIdx++
-		plName := fmt.Sprintf("%d.m3u8", index)
-		codecArgs := getCodecArgs(format)
 		streams = append(streams, FloatStream{
-			plName:    plName,
-			index:     index,
-			typeIndex: fmt.Sprintf("a:%d", typeIndex),
-			codecArgs: codecArgs,
-			stream:    stream,
+			index:        index,
+			typeIndex:    fmt.Sprintf("a:%d", typeIndex),
+			stream:       stream,
+			targetFormat: &format,
 		})
 	}
 	if audioStreamIdx == 0 {
@@ -181,22 +179,17 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream, opti
 		}
 
 		index := getStreamIdx()
-		codecArgs := getCodecArgs(format)
-		plName := fmt.Sprintf("%d.m3u8", index)
-		name := fmt.Sprintf("%d.%s", index, format.ext)
+		typeIndex := len(subtitleStreams)
 		subtitleStreams = append(subtitleStreams, FloatStream{
-			index:     index,
-			plName:    plName,
-			name:      name,
-			stream:    stream,
-			format:    format.format,
-			ext:       format.ext,
-			codecArgs: codecArgs,
+			index:        index,
+			typeIndex:    fmt.Sprintf("s:%d", typeIndex),
+			stream:       stream,
+			targetFormat: &format,
 		})
 	}
 
-	mainPlFilename := path.Join(cwd, "main.m3u8")
-	if _, err = os.Stat(mainPlFilename); err == nil {
+	mainPlName := "main.m3u8"
+	if _, err = os.Stat(path.Join(cwd, mainPlName)); err == nil {
 		log.Printf("Main playlist exists, skip\n")
 		return
 	}
@@ -215,7 +208,8 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream, opti
 
 	for _, stream := range streams {
 		codecKey := fmt.Sprintf("-codec:%d", stream.index)
-		hlsArgs = append(append(hlsArgs, codecKey), stream.codecArgs...)
+		codecArgs := getCodecArgs(*stream.targetFormat)
+		hlsArgs = append(append(hlsArgs, codecKey), codecArgs...)
 	}
 
 	var varStreamMapItems []string
@@ -261,8 +255,10 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream, opti
 		subtitlesArgs = append(subtitlesArgs, "-map", mapVal)
 		codecKey := fmt.Sprintf("-codec:%d", stream.index)
 		subtitlesArgs = append(subtitlesArgs, codecKey)
-		subtitlesArgs = append(subtitlesArgs, stream.codecArgs...)
-		subtitlesArgs = append(subtitlesArgs, "-f", stream.format, stream.name)
+		codecArgs := getCodecArgs(*stream.targetFormat)
+		subtitlesArgs = append(subtitlesArgs, codecArgs...)
+		format := stream.targetFormat.format
+		subtitlesArgs = append(subtitlesArgs, "-f", format, stream.getChunkName())
 	}
 
 	args := []string{"-hide_banner", "-y", "-i", filepath}
@@ -284,14 +280,13 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream, opti
 	}
 
 	for _, stream := range subtitleStreams {
-		plName := stream.plName
-		plFilename := path.Join(cwd, plName)
+		plFilename := path.Join(cwd, stream.getPlaylistName())
 
 		data := strings.Join([]string{
 			"#EXTM3U",
 			"#EXT-X-TARGETDURATION:0",
 			"#EXT-X-PLAYLIST-TYPE:VOD",
-			stream.name,
+			stream.getChunkName(),
 			"#EXT-X-ENDLIST",
 		}, "\n")
 
@@ -300,18 +295,20 @@ func FfmpegExtractStreams(cwd, filepath string, probeStreams []ProbeStream, opti
 		}
 	}
 
-	err = BuildMain(cwd, append(streams, subtitleStreams...), mainPlFilename)
+	err = buildMainPlaylist(cwd, append(streams, subtitleStreams...), mainPlName)
 
 	return
 }
 
-func BuildMain(cwd string, processedStreams []FloatStream, filename string) (err error) {
+func buildMainPlaylist(cwd string, streams []FloatStream, name string) (err error) {
+	filename := path.Join(cwd, name)
+
 	var lines = []string{
 		"#EXTM3U",
 	}
 
-	for _, f := range processedStreams {
-		plFullName := path.Join(cwd, f.plName)
+	for _, f := range streams {
+		plFullName := path.Join(cwd, f.getPlaylistName())
 		switch f.stream.CodecType {
 		case VIDEO_CODEC:
 			filename := path.Base(plFullName)
