@@ -31,6 +31,8 @@ func main() {
 	var rawFiles arrayFlags
 	var aLangs arrayFlags
 	var sLangs arrayFlags
+	var aMasks arrayFlags
+	var sMasks arrayFlags
 	var hlsSplitByTime bool
 	var hlsTime int
 	var hlsSegmentType string
@@ -49,6 +51,8 @@ func main() {
 		f.Var(&rawFiles, "f", "Media file")
 		f.Var(&aLangs, "al", "Add audio language filter")
 		f.Var(&sLangs, "sl", "Add subtilte language filter")
+		f.Var(&aMasks, "aMask", "Add audio title mask filter")
+		f.Var(&sMasks, "sMask", "Add subtilte title mask filter")
 		f.IntVar(&hlsTime, "hlsTime", 10, "Set hls segment time")
 		f.BoolVar(&hlsSplitByTime, "hlsSplitByTime", false, "Add hls split by time flag")
 		f.StringVar(&hlsSegmentType, "hlsSegmentType", "", "Force set hls segment type: mpegts or fmp4")
@@ -74,6 +78,8 @@ func main() {
 	options := internal.NewOptions(
 		aLangs,
 		sLangs,
+		aMasks,
+		sMasks,
 		hlsSplitByTime,
 		hlsTime,
 		hlsSegmentType,

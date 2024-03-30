@@ -136,7 +136,11 @@ func getHlsArgs(getStreamIdx func() int, probeStreams []ProbeStream, options Opt
 	var audioStreamIdx = 0
 	for _, stream := range getStreamsByType(probeStreams, AUDIO_CODEC) {
 		language := stream.Tags["language"]
+		title := stream.Tags["title"]
 		if len(options.aLangs) > 0 && !ArrayContain(options.aLangs, language) {
+			continue
+		}
+		if len(options.aMasks) > 0 && !MatchMasksString(options.aMasks, title) {
 			continue
 		}
 
@@ -222,7 +226,11 @@ func getSubtitleArgs(cwd string, getStreamIdx func() int, probeStreams []ProbeSt
 		}
 
 		language := stream.Tags["language"]
+		title := stream.Tags["title"]
 		if len(options.sLangs) > 0 && !ArrayContain(options.sLangs, language) {
+			continue
+		}
+		if len(options.sMasks) > 0 && !MatchMasksString(options.sMasks, title) {
 			continue
 		}
 
