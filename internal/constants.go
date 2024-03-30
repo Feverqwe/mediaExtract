@@ -14,7 +14,7 @@ var CODEC_TARGET_FORMAT = []TargetFormat{
 		codecNames: []string{"h264", "hevc"},
 		codec:      "copy",
 	}, {
-		codecNames: []string{"mp3"},
+		codecNames: []string{"mp3", "aac"},
 		codec:      "copy",
 	}, {
 		codecNames:  []string{"ac3", "eac3", "dts", "truehd"},
