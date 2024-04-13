@@ -2,6 +2,7 @@ package internal
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path"
 	"strings"
@@ -27,18 +28,21 @@ func Extract(files []string, options Options) (err error) {
 	cwd := path.Join(path.Dir(firstFilename), placeName)
 	os.MkdirAll(cwd, DIR_PERM)
 
-	metaFilename := path.Join(cwd, "meta.json")
-	if _, err = os.Stat(metaFilename); err != nil {
-		var data []byte
-		data, err = json.MarshalIndent(probeResults, "", " ")
-		if err != nil {
-			return
-		}
+	var data []byte
+	data, err = json.MarshalIndent(probeResults, "", " ")
+	if err != nil {
+		return
+	}
 
-		err = os.WriteFile(metaFilename, data, FILE_PERM)
-		if err != nil {
-			return
-		}
+	if options.meta {
+		fmt.Println(string(data))
+		return
+	}
+
+	metaFilename := path.Join(cwd, "meta.json")
+	err = os.WriteFile(metaFilename, data, FILE_PERM)
+	if err != nil {
+		return
 	}
 
 	err = FfmpegExtractStreams(cwd, files, streams, options)
