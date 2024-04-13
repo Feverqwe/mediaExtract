@@ -40,7 +40,7 @@ func ProbeFile(inputIndex int, filename string) (result *ProbeResult, err error)
 	return
 }
 
-func FfmpegExtractStreams(cwd string, files []string, probeStreams []ProbeStream, options Options) (err error) {
+func FfmpegExtractStreams(cwd string, files []string, probeStreams []ProbeStream, options *Options) (err error) {
 	streamIdx := 0
 	getStreamIdx := func() (idx int) {
 		idx = streamIdx
@@ -99,7 +99,7 @@ func FfmpegExtractStreams(cwd string, files []string, probeStreams []ProbeStream
 	return
 }
 
-func getHlsArgs(getStreamIdx func() int, probeStreams []ProbeStream, options Options) (streams []FloatStream, args []string, err error) {
+func getHlsArgs(getStreamIdx func() int, probeStreams []ProbeStream, options *Options) (streams []FloatStream, args []string, err error) {
 	var hasHavc bool
 
 	var videoStreamIdx = 0
@@ -219,7 +219,7 @@ func getHlsArgs(getStreamIdx func() int, probeStreams []ProbeStream, options Opt
 	return
 }
 
-func getSubtitleArgs(cwd string, getStreamIdx func() int, probeStreams []ProbeStream, options Options) (streams []FloatStream, args []string, postProcess func() error, err error) {
+func getSubtitleArgs(cwd string, getStreamIdx func() int, probeStreams []ProbeStream, options *Options) (streams []FloatStream, args []string, postProcess func() error, err error) {
 	for _, stream := range getStreamsByType(probeStreams, SUBTITLE_CODEC) {
 		if ArrayContain(SKIP_CODECS, stream.CodecName) {
 			continue

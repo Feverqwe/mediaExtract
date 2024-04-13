@@ -10,9 +10,10 @@ type Options struct {
 	hlsSegmentType        string
 	hlsMasterPlaylistName string
 	meta                  bool
+	target                string
 }
 
-func NewOptions(aLangs []string, sLangs []string, aMasks []string, sMasks []string, hlsSplitByTime bool, hlsTime int, hlsSegmentType string, hlsMasterPlaylistName string, meta bool) Options {
+func NewOptions(aLangs []string, sLangs []string, aMasks []string, sMasks []string, hlsSplitByTime bool, hlsTime int, hlsSegmentType string, hlsMasterPlaylistName string, meta bool, target string) Options {
 	return Options{
 		aLangs:                aLangs,
 		sLangs:                sLangs,
@@ -23,6 +24,7 @@ func NewOptions(aLangs []string, sLangs []string, aMasks []string, sMasks []stri
 		hlsSegmentType:        hlsSegmentType,
 		hlsMasterPlaylistName: hlsMasterPlaylistName,
 		meta:                  meta,
+		target:                target,
 	}
 }
 

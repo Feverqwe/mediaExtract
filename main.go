@@ -30,6 +30,7 @@ func main() {
 
 	var meta bool
 	var rawFiles arrayFlags
+	var rawTarget string
 	var aLangs arrayFlags
 	var sLangs arrayFlags
 	var aMasks arrayFlags
@@ -51,6 +52,7 @@ func main() {
 	case COMMAND_FILE:
 		f.BoolVar(&meta, "meta", false, "Show metadata")
 		f.Var(&rawFiles, "f", "Media file")
+		f.StringVar(&rawTarget, "t", "", "Traget folder")
 		f.Var(&aLangs, "al", "Add audio language filter")
 		f.Var(&sLangs, "sl", "Add subtilte language filter")
 		f.Var(&aMasks, "aMask", "Add audio title mask filter")
@@ -65,6 +67,14 @@ func main() {
 	if len(rawFiles) == 0 {
 		log.Printf("Please provide \"%s\" argument\n", "-f")
 		return
+	}
+
+	var target string
+	if rawTarget != "" {
+		if target, err = filepath.Abs(rawTarget); err != nil {
+			log.Fatal(err)
+			return
+		}
 	}
 
 	var files []string
@@ -87,9 +97,10 @@ func main() {
 		hlsSegmentType,
 		hlsMasterPlaylistName,
 		meta,
+		target,
 	)
 
-	err = internal.Extract(files, options)
+	err = internal.Extract(files, &options)
 	if err != nil {
 		log.Fatal(err)
 		return
