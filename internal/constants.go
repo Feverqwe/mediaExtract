@@ -28,6 +28,6 @@ var CODEC_TARGET_FORMAT = []TargetFormat{
 	}, {
 		codecNames:  []string{"mpeg4"},
 		codec:       "h264",
-		codecParams: []string{"-crf", "12", "-preset", "slow", "-movflags", "+faststart"},
+		codecParams: []string{"-crf", "12", "-preset", "slow"},
 	},
 }
