@@ -27,7 +27,7 @@ var CODEC_TARGET_FORMAT = []TargetFormat{
 		ext:        "vtt",
 	}, {
 		codecNames:  []string{"mpeg4"},
-		codec:       "h264",
+		codec:       "h264_v4l2m2m",
 		codecParams: []string{"-crf", "12", "-preset", "slow"},
 	},
 }
