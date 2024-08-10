@@ -96,24 +96,30 @@ func runDir(args []string) (err error) {
 
 	f := flag.NewFlagSet(fmt.Sprintf("%s %s", os.Args[0], command), flag.ExitOnError)
 
-	var directory string
+	var rawDirectory string
 	var patterns internal.ArrayFlags
 	var deepLevel int
 
 	basicOptions := internal.GetBasicOptions(f)
-	f.StringVar(&directory, "d", "", "Media directory")
+	f.StringVar(&rawDirectory, "d", "", "Media directory")
 	f.Var(&patterns, "p", "File name patterns")
 	f.IntVar(&deepLevel, "l", 0, "Subdirectory deep level")
 
 	f.Parse(args)
 
-	if len(directory) == 0 {
+	if len(rawDirectory) == 0 {
 		log.Printf("Please provide \"%s\" argument\n", "-d")
 		return
 	}
 
 	if len(patterns) == 0 {
 		log.Printf("Please provide \"%s\" argument\n", "-p")
+		return
+	}
+
+	var directory string
+	if directory, err = filepath.Abs(rawDirectory); err != nil {
+		log.Fatal(err)
 		return
 	}
 
@@ -139,7 +145,6 @@ func runDir(args []string) (err error) {
 	for _, filename := range allFiles {
 		relFilename := filename[len(directory)+dirOffset:]
 		log.Printf("Processing file \"%s\"\n", relFilename)
-
 		target := internal.GetTargetName(filename)
 		if _, err = os.Stat(target); err == nil {
 			log.Printf("Target folder \"%s\" exists, skip\n", target)
