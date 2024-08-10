@@ -130,7 +130,7 @@ func runDir(args []string) (err error) {
 
 	for _, filename := range allFiles {
 		relFilename := filename[len(directory)+dirOffset:]
-		log.Println("Processing file", relFilename)
+		log.Printf("Processing file \"%s\"\n", relFilename)
 		target := ""
 		options := internal.NewFileOptions(
 			basicOptions,
