@@ -41,9 +41,12 @@ func GetBasicOptions(f *flag.FlagSet) BasicOptions {
 	return basicOptions
 }
 
-func GetTargetName(fp string) string {
+func GetTargetName(fp string, td string) string {
 	filename := path.Base(fp)
 	name := strings.TrimSuffix(filename, path.Ext(filename))
 	placeName := name + ".media"
-	return path.Join(path.Dir(fp), placeName)
+	if td == "" {
+		td = path.Dir(fp)
+	}
+	return path.Join(td, placeName)
 }

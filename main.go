@@ -6,8 +6,8 @@ import (
 	"log"
 	"mediaExtract/internal"
 	"os"
+	"path"
 	"path/filepath"
-	"strings"
 )
 
 const COMMAND_FILE = "file"
@@ -79,7 +79,7 @@ func runFile(args []string) (err error) {
 
 	if target == "" {
 		firstFilename := files[0]
-		target = internal.GetTargetName(firstFilename)
+		target = internal.GetTargetName(firstFilename, "")
 	}
 
 	options := internal.NewFileOptions(
@@ -97,11 +97,13 @@ func runDir(args []string) (err error) {
 	f := flag.NewFlagSet(fmt.Sprintf("%s %s", os.Args[0], command), flag.ExitOnError)
 
 	var rawDirectory string
+	var rawTargetDirectory string
 	var patterns internal.ArrayFlags
 	var deepLevel int
 
 	basicOptions := internal.GetBasicOptions(f)
 	f.StringVar(&rawDirectory, "d", "", "Media directory")
+	f.StringVar(&rawTargetDirectory, "td", "", "Target directory")
 	f.Var(&patterns, "p", "File name patterns")
 	f.IntVar(&deepLevel, "l", 0, "Subdirectory deep level")
 
@@ -123,9 +125,12 @@ func runDir(args []string) (err error) {
 		return
 	}
 
-	dirOffset := 1
-	if strings.HasSuffix(directory, string(filepath.Separator)) {
-		dirOffset -= 1
+	targetDirectory := directory
+	if rawTargetDirectory != "" {
+		if targetDirectory, err = filepath.Abs(rawTargetDirectory); err != nil {
+			log.Fatal(err)
+			return
+		}
 	}
 
 	var allFiles []string
@@ -143,9 +148,12 @@ func runDir(args []string) (err error) {
 	}
 
 	for _, filename := range allFiles {
-		relFilename := filename[len(directory)+dirOffset:]
+		relFilename := filename[len(directory)+1:]
+		relFileDir := path.Dir(relFilename)
 		log.Printf("Processing file \"%s\"\n", relFilename)
-		target := internal.GetTargetName(filename)
+
+		targetDir := path.Join(targetDirectory, relFileDir)
+		target := internal.GetTargetName(filename, targetDir)
 		if _, err = os.Stat(target); err == nil {
 			log.Printf("Target folder \"%s\" exists, skip\n", target)
 			continue
