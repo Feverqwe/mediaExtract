@@ -206,10 +206,7 @@ func getHlsArgs(getStreamIdx func() int, probeStreams []ProbeStream, options *Op
 		"-hls_segment_type", segmentType,
 		"-hls_flags", strings.Join(hlsFlags, "+"),
 		"-hls_playlist_type", "event",
-	}
-
-	if options.hlsMasterPlaylistName != "" {
-		formatArgs = append(formatArgs, "-master_pl_name", options.hlsMasterPlaylistName)
+		"-master_pl_name", "preview.m3u8",
 	}
 
 	formatArgs = append(formatArgs, "%v.m3u8")

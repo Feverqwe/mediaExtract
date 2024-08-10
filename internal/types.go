@@ -12,15 +12,14 @@ func (i *ArrayFlags) Set(value string) error {
 }
 
 type BasicOptions struct {
-	meta                  bool
-	aLangs                ArrayFlags
-	sLangs                ArrayFlags
-	aMasks                ArrayFlags
-	sMasks                ArrayFlags
-	hlsSplitByTime        bool
-	hlsTime               int
-	hlsSegmentType        string
-	hlsMasterPlaylistName string
+	meta           bool
+	aLangs         ArrayFlags
+	sLangs         ArrayFlags
+	aMasks         ArrayFlags
+	sMasks         ArrayFlags
+	hlsSplitByTime bool
+	hlsTime        int
+	hlsSegmentType string
 }
 
 type Options struct {

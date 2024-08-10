@@ -38,7 +38,6 @@ func GetBasicOptions(f *flag.FlagSet) BasicOptions {
 	f.IntVar(&basicOptions.hlsTime, "hlsTime", 10, "Set hls segment time")
 	f.BoolVar(&basicOptions.hlsSplitByTime, "hlsSplitByTime", false, "Add hls split by time flag")
 	f.StringVar(&basicOptions.hlsSegmentType, "hlsSegmentType", "", "Force set hls segment type: mpegts or fmp4")
-	f.StringVar(&basicOptions.hlsMasterPlaylistName, "hlsMasterPlaylistName", "", "Create HLS master playlist with the given name")
 	return basicOptions
 }
 
