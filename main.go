@@ -77,6 +77,11 @@ func runFile(args []string) (err error) {
 		files = append(files, fullFilename)
 	}
 
+	if target == "" {
+		firstFilename := files[0]
+		target = internal.GetTargetName(firstFilename)
+	}
+
 	options := internal.NewFileOptions(
 		basicOptions,
 		target,
@@ -134,7 +139,13 @@ func runDir(args []string) (err error) {
 	for _, filename := range allFiles {
 		relFilename := filename[len(directory)+dirOffset:]
 		log.Printf("Processing file \"%s\"\n", relFilename)
-		target := ""
+
+		target := internal.GetTargetName(filename)
+		if _, err = os.Stat(target); err == nil {
+			log.Printf("Target folder \"%s\" exists, skip\n", target)
+			continue
+		}
+
 		options := internal.NewFileOptions(
 			basicOptions,
 			target,

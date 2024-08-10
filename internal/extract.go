@@ -2,16 +2,16 @@ package internal
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
-	"log"
 	"os"
 	"path"
 )
 
 func Extract(files []string, options *Options) (err error) {
 	if options.target == "" {
-		firstFilename := files[0]
-		options.target = GetTargetName(firstFilename)
+		err = errors.New("target_is_empty")
+		return
 	}
 
 	var probeResults []*ProbeResult
@@ -26,11 +26,6 @@ func Extract(files []string, options *Options) (err error) {
 	}
 
 	var cwd = options.target
-
-	if _, err = os.Stat(cwd); err == nil {
-		log.Printf("Target folder \"%s\" exists, skip\n", cwd)
-		return
-	}
 
 	var data []byte
 	data, err = json.MarshalIndent(probeResults, "", " ")
