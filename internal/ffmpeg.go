@@ -70,11 +70,7 @@ func FfmpegExtractStreams(cwd string, files []string, probeStreams []ProbeStream
 	args = append(args, hlsArgs...)
 	args = append(args, subtitlesArgs...)
 
-	mainPlName := "main.m3u8"
-	if _, err = os.Stat(path.Join(cwd, mainPlName)); err == nil {
-		log.Printf("Main playlist exists, skip\n")
-		return
-	}
+	mainPlName := MAIN_PLAYLIST_NAME
 
 	log.Printf("Run ffmpeg with args: %v\n", args)
 

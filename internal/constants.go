@@ -1,5 +1,7 @@
 package internal
 
+const MAIN_PLAYLIST_NAME = "main.m3u8"
+
 const DIR_PERM = 0700
 const FILE_PERM = 0600
 

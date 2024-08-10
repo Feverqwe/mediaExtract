@@ -3,6 +3,7 @@ package internal
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"path"
 )
@@ -25,7 +26,11 @@ func Extract(files []string, options *Options) (err error) {
 	}
 
 	var cwd = options.target
-	os.MkdirAll(cwd, DIR_PERM)
+
+	if _, err = os.Stat(cwd); err == nil {
+		log.Printf("Target folder \"%s\" exists, skip\n", cwd)
+		return
+	}
 
 	var data []byte
 	data, err = json.MarshalIndent(probeResults, "", " ")
@@ -37,6 +42,8 @@ func Extract(files []string, options *Options) (err error) {
 		fmt.Println(string(data))
 		return
 	}
+
+	os.MkdirAll(cwd, DIR_PERM)
 
 	metaFilename := path.Join(cwd, "meta.json")
 	err = os.WriteFile(metaFilename, data, FILE_PERM)
