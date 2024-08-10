@@ -1,30 +1,38 @@
 package internal
 
-type Options struct {
-	aLangs                []string
-	sLangs                []string
-	aMasks                []string
-	sMasks                []string
+type ArrayFlags []string
+
+func (i *ArrayFlags) String() string {
+	return "<list>"
+}
+
+func (i *ArrayFlags) Set(value string) error {
+	*i = append(*i, value)
+	return nil
+}
+
+type BasicOptions struct {
+	meta                  bool
+	aLangs                ArrayFlags
+	sLangs                ArrayFlags
+	aMasks                ArrayFlags
+	sMasks                ArrayFlags
 	hlsSplitByTime        bool
 	hlsTime               int
 	hlsSegmentType        string
 	hlsMasterPlaylistName string
-	meta                  bool
-	target                string
 }
 
-func NewOptions(aLangs []string, sLangs []string, aMasks []string, sMasks []string, hlsSplitByTime bool, hlsTime int, hlsSegmentType string, hlsMasterPlaylistName string, meta bool, target string) Options {
+type Options struct {
+	BasicOptions
+	meta   bool
+	target string
+}
+
+func NewFileOptions(basicOptions BasicOptions, target string) Options {
 	return Options{
-		aLangs:                aLangs,
-		sLangs:                sLangs,
-		aMasks:                aMasks,
-		sMasks:                sMasks,
-		hlsSplitByTime:        hlsSplitByTime,
-		hlsTime:               hlsTime,
-		hlsSegmentType:        hlsSegmentType,
-		hlsMasterPlaylistName: hlsMasterPlaylistName,
-		meta:                  meta,
-		target:                target,
+		BasicOptions: basicOptions,
+		target:       target,
 	}
 }
 

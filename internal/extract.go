@@ -5,16 +5,12 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"strings"
 )
 
 func Extract(files []string, options *Options) (err error) {
 	if options.target == "" {
 		firstFilename := files[0]
-		filename := path.Base(firstFilename)
-		name := strings.TrimSuffix(filename, path.Ext(filename))
-		placeName := name + ".media"
-		options.target = path.Join(path.Dir(firstFilename), placeName)
+		options.target = GetTargetName(firstFilename)
 	}
 
 	var probeResults []*ProbeResult
