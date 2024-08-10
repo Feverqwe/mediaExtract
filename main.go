@@ -92,13 +92,13 @@ func runDir(args []string) (err error) {
 	f := flag.NewFlagSet(fmt.Sprintf("%s %s", os.Args[0], command), flag.ExitOnError)
 
 	var directory string
-	var pattern string
+	var patterns internal.ArrayFlags
 	var deepLevel int
 
 	basicOptions := internal.GetBasicOptions(f)
 	f.StringVar(&directory, "d", "", "Media directory")
-	f.StringVar(&pattern, "p", "", "File name pattern")
-	f.IntVar(&deepLevel, "l", 10, "Subdirectory deep level")
+	f.Var(&patterns, "p", "File name patterns")
+	f.IntVar(&deepLevel, "l", 0, "Subdirectory deep level")
 
 	f.Parse(args)
 
@@ -107,7 +107,7 @@ func runDir(args []string) (err error) {
 		return
 	}
 
-	if len(pattern) == 0 {
+	if len(patterns) == 0 {
 		log.Printf("Please provide \"%s\" argument\n", "-p")
 		return
 	}
@@ -120,11 +120,14 @@ func runDir(args []string) (err error) {
 	var allFiles []string
 	level := ""
 	for i := 0; i <= deepLevel; i++ {
-		files, err := filepath.Glob(filepath.Join(directory, level, pattern))
-		if err != nil {
-			return err
+		for _, pattern := range patterns {
+			var files []string
+			files, err = filepath.Glob(filepath.Join(directory, level, pattern))
+			if err != nil {
+				return
+			}
+			allFiles = append(allFiles, files...)
 		}
-		allFiles = append(allFiles, files...)
 		level += "*" + string(filepath.Separator)
 	}
 
