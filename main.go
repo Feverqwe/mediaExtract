@@ -154,16 +154,6 @@ func runDir(args []string) (err error) {
 
 		targetDir := path.Join(targetDirectory, relFileDir)
 		target := internal.GetTargetName(filename, targetDir)
-		if _, err = os.Stat(target); err == nil {
-			if _, err = os.Stat(path.Join(target, internal.MAIN_PLAYLIST_NAME)); err == nil {
-				log.Printf("Target folder \"%s\" exists, skip\n", target)
-				continue
-			}
-			log.Printf("Cleanup incomplete target folder \"%s\"\n", target)
-			if err = os.RemoveAll(target); err != nil {
-				return
-			}
-		}
 
 		options := internal.NewFileOptions(
 			basicOptions,

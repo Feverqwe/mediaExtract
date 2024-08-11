@@ -71,6 +71,9 @@ func FfmpegExtractStreams(cwd string, files []string, probeStreams []ProbeStream
 	args = append(args, subtitlesArgs...)
 
 	mainPlName := MAIN_PLAYLIST_NAME
+	if err = ClenupTargetFolder(cwd, streams, []string{mainPlName, PREVIEW_PLAYLIST_NAME}); err != nil {
+		return
+	}
 
 	log.Printf("Run ffmpeg with args: %v\n", args)
 
@@ -202,7 +205,7 @@ func getHlsArgs(getStreamIdx func() int, probeStreams []ProbeStream, options *Op
 		"-hls_segment_type", segmentType,
 		"-hls_flags", strings.Join(hlsFlags, "+"),
 		"-hls_playlist_type", "event",
-		"-master_pl_name", "preview.m3u8",
+		"-master_pl_name", PREVIEW_PLAYLIST_NAME,
 	}
 
 	formatArgs = append(formatArgs, "%v.m3u8")

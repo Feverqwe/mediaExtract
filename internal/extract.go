@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"path"
 )
@@ -11,6 +12,12 @@ import (
 func Extract(files []string, options *Options) (err error) {
 	if options.target == "" {
 		err = errors.New("target_is_empty")
+		return
+	}
+
+	cwd := options.target
+	if _, err = os.Stat(path.Join(cwd, MAIN_PLAYLIST_NAME)); err == nil {
+		log.Printf("Main playlist exists \"%s\", skip\n", cwd)
 		return
 	}
 
@@ -24,8 +31,6 @@ func Extract(files []string, options *Options) (err error) {
 		streams = append(streams, probe.Streams...)
 		probeResults = append(probeResults, probe)
 	}
-
-	var cwd = options.target
 
 	var data []byte
 	data, err = json.MarshalIndent(probeResults, "", " ")

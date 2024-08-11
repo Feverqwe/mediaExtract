@@ -2,6 +2,8 @@ package internal
 
 import (
 	"flag"
+	"log"
+	"os"
 	"path"
 	"strings"
 
@@ -49,4 +51,24 @@ func GetTargetName(fp string, td string) string {
 		td = path.Dir(fp)
 	}
 	return path.Join(td, placeName)
+}
+
+func ClenupTargetFolder(cwd string, streams []FloatStream, extraFiles []string) (err error) {
+	files := extraFiles
+
+	for _, stream := range streams {
+		files = append(files, stream.getPlaylistName())
+	}
+
+	for _, relFilename := range files {
+		filename := path.Join(cwd, relFilename)
+		if _, sErr := os.Stat(filename); sErr == nil {
+			log.Printf("Removing incomplete playlist \"%s\"\n", relFilename)
+			if err = os.Remove(filename); err != nil {
+				return
+			}
+		}
+	}
+
+	return
 }
