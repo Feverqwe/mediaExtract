@@ -20,7 +20,7 @@ var CODEC_TARGET_FORMAT = []TargetFormat{
 		codecNames: []string{"mp3", "aac"},
 		codec:      "copy",
 	}, {
-		codecNames:  []string{"ac3", "eac3", "dts", "truehd"},
+		codecNames:  []string{"ac3", "eac3", "dts", "truehd", "mp2"},
 		codec:       "libfdk_aac",
 		codecParams: []string{"-vbr", "5"},
 	}, {
