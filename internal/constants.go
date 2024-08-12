@@ -29,7 +29,7 @@ var CODEC_TARGET_FORMAT = []TargetFormat{
 		format:     "webvtt",
 		ext:        "vtt",
 	}, {
-		codecNames:  []string{"mpeg4"},
+		codecNames:  []string{"mpeg4", "mpeg2video"},
 		codec:       "h264",
 		codecParams: []string{"-crf", "12", "-preset", "slow"},
 	},
