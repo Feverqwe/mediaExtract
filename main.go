@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 )
 
 const COMMAND_FILE = "file"
@@ -138,7 +139,7 @@ func runDir(args []string) (err error) {
 	for i := 0; i <= deepLevel; i++ {
 		for _, pattern := range patterns {
 			var files []string
-			files, err = filepath.Glob(filepath.Join(directory, level, pattern))
+			files, err = filepath.Glob(filepath.Join(regexp.QuoteMeta(directory), level, pattern))
 			if err != nil {
 				return
 			}
