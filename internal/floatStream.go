@@ -30,7 +30,7 @@ func (s *FloatStream) getStreamName() string {
 		parts = append(parts, title)
 	}
 	if len(parts) == 0 {
-		parts = append(parts, fmt.Sprintf("%d", s.stream.inputIndex))
+		parts = append(parts, fmt.Sprintf("%d-%d", s.stream.inputIndex, s.stream.Index))
 	}
 	return strings.Join(parts, " - ")
 }
