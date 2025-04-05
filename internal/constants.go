@@ -10,7 +10,7 @@ const VIDEO_CODEC = "video"
 const AUDIO_CODEC = "audio"
 const SUBTITLE_CODEC = "subtitle"
 
-var SKIP_CODECS = []string{"mjpeg", "hdmv_pgs_subtitle"}
+var SKIP_CODECS = []string{"mjpeg", "hdmv_pgs_subtitle", "png"}
 
 var CODEC_TARGET_FORMAT = []TargetFormat{
 	{
