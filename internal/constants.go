@@ -24,7 +24,7 @@ var CODEC_TARGET_FORMAT = []TargetFormat{
 		codec:       "libfdk_aac",
 		codecParams: []string{"-vbr", "5"},
 	}, {
-		codecNames: []string{"subrip"},
+		codecNames: []string{"subrip", "mov_text"},
 		codec:      "webvtt",
 		format:     "webvtt",
 		ext:        "vtt",
