@@ -19,7 +19,7 @@ var CODEC_TARGET_FORMAT = []TargetFormat{
 	}, {
 		codecNames:  []string{"hevc"},
 		codec:       "copy",
-		codecParams: []string{"-tag:v", "hvc1"},
+		codecParams: []string{"-tag:v", "hvc1", "-strict", "unofficial"},
 	}, {
 		codecNames: []string{"mp3", "aac"},
 		codec:      "copy",
