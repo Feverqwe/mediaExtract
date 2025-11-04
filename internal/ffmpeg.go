@@ -168,10 +168,10 @@ func getHlsArgs(getStreamIdx func() int, probeStreams []ProbeStream, options *Op
 		args = append(args, "-map", stream.inputIndex)
 	}
 
-	for _, stream := range streams {
+	/* for _, stream := range streams {
 		key := fmt.Sprintf("-b:%d", stream.index)
 		args = append(args, key, stream.getBitrate())
-	}
+	} */
 
 	for _, stream := range streams {
 		codecKey := fmt.Sprintf("-codec:%d", stream.index)
