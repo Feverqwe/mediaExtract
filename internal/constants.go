@@ -14,8 +14,12 @@ var SKIP_CODECS = []string{"mjpeg", "hdmv_pgs_subtitle", "png"}
 
 var CODEC_TARGET_FORMAT = []TargetFormat{
 	{
-		codecNames: []string{"h264", "hevc"},
+		codecNames: []string{"h264"},
 		codec:      "copy",
+	}, {
+		codecNames:  []string{"hevc"},
+		codec:       "copy",
+		codecParams: []string{"-tag:v", "hvc1"},
 	}, {
 		codecNames: []string{"mp3", "aac"},
 		codec:      "copy",
